@@ -1,5 +1,7 @@
 # VELA
 
+**Сайт:** https://vela-homes-tau.vercel.app · **Панель:** https://vela-homes-tau.vercel.app/admin · **Репозиторий:** https://github.com/1amacio1/vela-homes
+
 Русскоязычный сайт строительной компании: 12 проектов, фотогалереи, 5 направлений услуг, калькулятор, форма с загрузкой файлов, защищённая панель заявок и аналитики, реферальные ссылки и экспорт XLSX.
 
 ## Стек
@@ -19,17 +21,17 @@ npm run dev
 
 ## Окружение
 
-| Переменная | Назначение |
-|---|---|
-| `SUPABASE_URL` | URL Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Серверный секрет Supabase |
-| `ADMIN_EMAIL` | Логин администратора |
-| `ADMIN_PASSWORD_HASH` | `salt:hash`, scrypt с 64-байтовым ключом |
-| `SESSION_SECRET` | Секрет подписи сессий / upload receipts |
-| `NEXT_PUBLIC_SITE_URL` | Канонический публичный URL |
-| `TELEGRAM_BOT_TOKEN` | Токен бота, созданного в @BotFather |
-| `TELEGRAM_CHAT_ID` | ID менеджера/чата, которому разрешена отправка |
-| `NEXT_PUBLIC_YANDEX_METRIKA_ID` | Номер счётчика Метрики, только цифры |
+| Переменная                      | Назначение                                     |
+| ------------------------------- | ---------------------------------------------- |
+| `SUPABASE_URL`                  | URL Supabase                                   |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Серверный секрет Supabase                      |
+| `ADMIN_EMAIL`                   | Логин администратора                           |
+| `ADMIN_PASSWORD_HASH`           | `salt:hash`, scrypt с 64-байтовым ключом       |
+| `SESSION_SECRET`                | Секрет подписи сессий / upload receipts        |
+| `NEXT_PUBLIC_SITE_URL`          | Канонический публичный URL                     |
+| `TELEGRAM_BOT_TOKEN`            | Токен бота, созданного в @BotFather            |
+| `TELEGRAM_CHAT_ID`              | ID менеджера/чата, которому разрешена отправка |
+| `NEXT_PUBLIC_YANDEX_METRIKA_ID` | Номер счётчика Метрики, только цифры           |
 
 После изменения окружения выполните redeploy. `NEXT_PUBLIC_*` встраиваются при сборке. Персональный менеджер должен сначала нажать «Старт» в боте; для группы добавьте бота и разрешите писать сообщения.
 
@@ -50,6 +52,7 @@ npm run dev
 ```sh
 npm run typecheck
 npm run build
+npx playwright install chromium
 npm test
 ```
 

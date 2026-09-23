@@ -1,6 +1,77 @@
-'use client';
-import {calcSchema,estimate,type Calculation} from './calculator';
-import {flushSync} from 'react-dom';
-type Tool={name:string;description:string;inputSchema:object;annotations:{readOnlyHint:boolean};execute:(input:unknown)=>unknown};
-declare global{interface Document{modelContext?:{registerTool:(tool:Tool,options?:{signal?:AbortSignal})=>void|Promise<void>}}}
-export function registerCalculator(read:()=>Calculation,write:(c:Calculation)=>void){const context=document.modelContext;if(!context?.registerTool)return()=>{};const controller=new AbortController();const tool:Tool={name:'configure_house_calculator',description:'Изменяет параметры видимого калькулятора VELA и возвращает предварительный расчёт. Не отправляет заявку.',annotations:{readOnlyHint:false},inputSchema:{type:'object',additionalProperties:false,properties:{area:{type:'number',minimum:40,maximum:1000},floors:{type:'integer',minimum:1,maximum:3},material:{type:'string',enum:['Газобетон','Кирпич','Керамические блоки','Дерево','Каркас']},package:{type:'string',enum:['warm','white','full']},design:{type:'boolean'},landscape:{type:'boolean'},lawn:{type:'boolean'},lawnArea:{type:'number',minimum:0,maximum:10000},trees:{type:'integer',minimum:0,maximum:100},terrace:{type:'boolean'},lighting:{type:'boolean'},gazebo:{type:'boolean'}}},execute(input){const partial=calcSchema.partial().strict().parse(input);const value=calcSchema.parse({...read(),...partial});flushSync(()=>write(value));return {parameters:value,estimate:estimate(value),preliminary:true}}};try{void Promise.resolve(context.registerTool(tool,{signal:controller.signal})).catch(()=>{})}catch{}return()=>controller.abort()}
+"use client";
+import { calcSchema, estimate, type Calculation } from "./calculator";
+import { flushSync } from "react-dom";
+type Tool = {
+  name: string;
+  description: string;
+  inputSchema: object;
+  annotations: { readOnlyHint: boolean };
+  execute: (input: unknown) => unknown;
+};
+declare global {
+  interface Document {
+    modelContext?: {
+      registerTool: (
+        tool: Tool,
+        options?: { signal?: AbortSignal },
+      ) => void | Promise<void>;
+    };
+  }
+}
+export function registerCalculator(
+  read: () => Calculation,
+  write: (c: Calculation) => void,
+) {
+  const context = document.modelContext;
+  if (!context?.registerTool) return () => {};
+  const controller = new AbortController();
+  const tool: Tool = {
+    name: "configure_house_calculator",
+    description:
+      "Изменяет параметры видимого калькулятора VELA и возвращает предварительный расчёт. Не отправляет заявку.",
+    annotations: { readOnlyHint: false },
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        area: { type: "number", minimum: 40, maximum: 1000 },
+        floors: { type: "integer", minimum: 1, maximum: 3 },
+        material: {
+          type: "string",
+          enum: [
+            "Газобетон",
+            "Кирпич",
+            "Керамические блоки",
+            "Дерево",
+            "Каркас",
+          ],
+        },
+        package: { type: "string", enum: ["warm", "white", "full"] },
+        design: { type: "boolean" },
+        landscape: { type: "boolean" },
+        lawn: { type: "boolean" },
+        lawnArea: { type: "number", minimum: 0, maximum: 10000 },
+        trees: { type: "integer", minimum: 0, maximum: 100 },
+        terrace: { type: "boolean" },
+        lighting: { type: "boolean" },
+        gazebo: { type: "boolean" },
+      },
+    },
+    execute(input) {
+      const partial = calcSchema.partial().strict().parse(input);
+      const value = calcSchema.parse({ ...read(), ...partial });
+      flushSync(() => write(value));
+      return {
+        parameters: value,
+        estimate: estimate(value),
+        preliminary: true,
+      };
+    },
+  };
+  try {
+    void Promise.resolve(
+      context.registerTool(tool, { signal: controller.signal }),
+    ).catch(() => {});
+  } catch {}
+  return () => controller.abort();
+}

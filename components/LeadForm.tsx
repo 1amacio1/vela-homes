@@ -1,11 +1,371 @@
-'use client';
-import {createId} from '@/lib/id';
-import {useRef,useState} from 'react';
-import {Paperclip,Check,LoaderCircle,X} from 'lucide-react';
-import {services,type Calculation,estimate,money,calculatorText} from '@/lib/calculator';
-import {identity,track,flushTracking} from '@/lib/tracking';
-export default function LeadForm({calculation,clearCalculation,initialService}:{calculation:Calculation|null,clearCalculation:()=>void,initialService?:string}){const [selected,setSelected]=useState<string[]>(['Строительство дома']);const [files,setFiles]=useState<File[]>([]);const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [success,setSuccess]=useState('');const [step,setStep]=useState('');const started=useRef(false);const submissionId=useRef('');const input=useRef<HTMLInputElement>(null);
-async function submit(e:React.FormEvent<HTMLFormElement>){e.preventDefault();setError('');if(!selected.length){setError('Выберите хотя бы одну услугу.');return}setBusy(true);setStep('Сохраняем заявку…');const form=e.currentTarget;const f=new FormData(form);try{let receipt; if(files.length){setStep('Загружаем файлы…');const r=await fetch('/api/uploads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:files.map(file=>({name:file.name,type:file.type,size:file.size}))})});const data=await r.json();if(!r.ok)throw new Error(data.error);receipt=data.receipt;for(let i=0;i<files.length;i++){setStep(`Загружаем файл ${i+1} из ${files.length}…`);const upload=await fetch(data.files[i].url,{method:'PUT',headers:{'Content-Type':files[i].type,'x-upsert':'false'},body:files[i]});if(!upload.ok)throw new Error('Не удалось загрузить '+files[i].name+'. Попробуйте ещё раз.')}}setStep('Сохраняем заявку…');await flushTracking();submissionId.current||=createId();const response=await fetch('/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:submissionId.current,name:f.get('name'),phone:f.get('phone'),email:f.get('email'),region:f.get('region'),services:selected,area:calculation?.area||(f.get('area')?Number(f.get('area')):null),comment:f.get('comment'),consent:f.get('consent')==='on',website:f.get('website'),calculator:calculation,receipt,...identity()})});const data=await response.json();if(!response.ok)throw new Error(data.error);setSuccess(data.id);track('cta_click','Заявка отправлена');if(window.ym&&process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID)window.ym(Number(process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID),'reachGoal','lead_sent');form.reset();setFiles([])}catch(e){setError(e instanceof Error?e.message:'Не удалось отправить заявку. Попробуйте ещё раз.')}finally{setBusy(false)}}
-function chooseFiles(list:FileList|null){if(!list)return;const chosen=Array.from(list);const types=['application/pdf','image/jpeg','image/png','image/webp','image/gif','image/heic','image/heif'];if(chosen.length+files.length>5){setError('Можно приложить до 5 файлов.');return}if(chosen.some(f=>!types.includes(f.type)||f.size>10485760||f.size===0)){setError('Принимаем PDF, JPG, PNG, WEBP, GIF и HEIC до 10 МБ каждый.');return}setFiles([...files,...chosen]);setError('')}
-if(success)return <div className="form-success" role="status"><div className="success-icon"><Check size={34}/></div><p className="eyebrow">ПЕРВЫЙ ШАГ СДЕЛАН</p><h3>Ваша история<br/>начинается здесь.</h3><p>Заявка сохранена. Мы изучим ваши пожелания и свяжемся с вами.</p><small>Номер заявки: {success.slice(0,8).toUpperCase()}</small><button className="text-link" onClick={()=>{setSuccess('');submissionId.current='';clearCalculation()}}>Отправить ещё одну заявку ↗</button></div>;
-return <form className="lead-form" onSubmit={submit} onFocus={()=>{if(!started.current){track('form_start');started.current=true}}}>{calculation&&<div className="attached-calculation"><div><span>Расчёт прикреплён к заявке</span><strong>{calculation.area} м² · от {money(estimate(calculation).total)}</strong><details><summary>Параметры расчёта</summary><p style={{whiteSpace:'pre-line'}}>{calculatorText(calculation)}</p></details></div><button type="button" aria-label="Убрать расчёт" onClick={clearCalculation}><X size={18}/></button></div>}<div className="field-row"><label>Ваше имя *<input name="name" autoComplete="name" placeholder="Как к вам обращаться" required minLength={2} maxLength={100}/></label><label>Телефон *<input name="phone" type="tel" autoComplete="tel" placeholder="+7 (___) ___-__-__" required minLength={10} maxLength={30}/></label></div><div className="field-row"><label>Email *<input name="email" type="email" autoComplete="email" placeholder="mail@example.ru" required maxLength={200}/></label><label>Город / регион строительства *<input name="region" autoComplete="address-level1" placeholder="Например, Московская область" required minLength={2} maxLength={200}/></label></div><fieldset><legend>Что вы планируете? *</legend><div className="service-chips">{services.map(s=><label className={selected.includes(s)?'selected':''} key={s}><input type="checkbox" checked={selected.includes(s)} onChange={e=>setSelected(e.target.checked?[...selected,s]:selected.filter(x=>x!==s))}/>{s}</label>)}</div></fieldset><label>Примерная площадь, м²<input key={calculation?.area||'free'} type="number" name="area" min="10" max="10000" defaultValue={calculation?.area} placeholder="Например, 180" readOnly={!!calculation}/></label><label>Расскажите о проекте<textarea name="comment" rows={3} maxLength={5000} placeholder="Каким вы видите свой дом? Есть ли участок или готовый проект?" defaultValue={initialService?`Интересует: ${initialService}`:''}/></label><div className="honeypot" aria-hidden="true"><label>Ваш сайт<input name="website" tabIndex={-1} autoComplete="off"/></label></div><div className="upload-box"><input ref={input} className="visually-hidden" id="attachments" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,.heic,.heif" onChange={e=>{chooseFiles(e.target.files);e.target.value=''}}/><button type="button" onClick={()=>input.current?.click()}><Paperclip size={19}/><span>Прикрепить проект или референсы<small>До 5 файлов · PDF и изображения · до 10 МБ каждый</small></span></button>{files.map((file,i)=><div className="file-item" key={i}><span>{file.name}</span><button type="button" aria-label={'Удалить '+file.name} onClick={()=>setFiles(files.filter((_,n)=>i!==n))}><X size={16}/></button></div>)}</div><label className="check consent"><input type="checkbox" name="consent" required/><span>Я согласен с <a href="/privacy" target="_blank" rel="noreferrer">политикой конфиденциальности</a> и даю согласие на обработку персональных данных. *</span></label>{error&&<p role="alert" className="error">{error}</p>}<button className="button submit" type="submit" disabled={busy}>{busy?<><LoaderCircle className="spin" size={18}/>{step}</>:<>Обсудить мой проект <span>↗</span></>}</button><p className="helper">* Обязательные поля. Демонстрационная форма: используйте тестовые контактные данные.</p></form>}
+"use client";
+import { createId } from "@/lib/id";
+import { useRef, useState } from "react";
+import { Paperclip, Check, LoaderCircle, X } from "lucide-react";
+import {
+  services,
+  type Calculation,
+  estimate,
+  money,
+  calculatorText,
+} from "@/lib/calculator";
+import { identity, track, flushTracking, sourceMetadata } from "@/lib/tracking";
+export default function LeadForm({
+  calculation,
+  clearCalculation,
+  initialService,
+}: {
+  calculation: Calculation | null;
+  clearCalculation: () => void;
+  initialService?: string;
+}) {
+  const [selected, setSelected] = useState<string[]>(["Строительство дома"]);
+  const [files, setFiles] = useState<File[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [step, setStep] = useState("");
+  const started = useRef(false);
+  const submissionId = useRef("");
+  const input = useRef<HTMLInputElement>(null);
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError("");
+    if (!selected.length) {
+      setError("Выберите хотя бы одну услугу.");
+      return;
+    }
+    setBusy(true);
+    setStep("Сохраняем заявку…");
+    const form = e.currentTarget;
+    const f = new FormData(form);
+    try {
+      let receipt;
+      if (files.length) {
+        setStep("Загружаем файлы…");
+        const r = await fetch("/api/uploads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            files: files.map((file) => ({
+              name: file.name,
+              type: file.type,
+              size: file.size,
+            })),
+          }),
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error);
+        receipt = data.receipt;
+        for (let i = 0; i < files.length; i++) {
+          setStep(`Загружаем файл ${i + 1} из ${files.length}…`);
+          const upload = await fetch(data.files[i].url, {
+            method: "PUT",
+            headers: { "Content-Type": files[i].type, "x-upsert": "false" },
+            body: files[i],
+          });
+          if (!upload.ok)
+            throw new Error(
+              "Не удалось загрузить " + files[i].name + ". Попробуйте ещё раз.",
+            );
+        }
+      }
+      setStep("Сохраняем заявку…");
+      await flushTracking();
+      submissionId.current ||= createId();
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: submissionId.current,
+          name: f.get("name"),
+          phone: f.get("phone"),
+          email: f.get("email"),
+          region: f.get("region"),
+          services: selected,
+          area:
+            calculation?.area || (f.get("area") ? Number(f.get("area")) : null),
+          comment: f.get("comment"),
+          consent: f.get("consent") === "on",
+          website: f.get("website"),
+          calculator: calculation,
+          receipt,
+          ...identity(),
+          ...sourceMetadata(),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      setSuccess(data.id);
+      track("cta_click", "Заявка отправлена");
+      if (window.ym && process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID)
+        window.ym(
+          Number(process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID),
+          "reachGoal",
+          "lead_sent",
+        );
+      form.reset();
+      setFiles([]);
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Не удалось отправить заявку. Попробуйте ещё раз.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+  function chooseFiles(list: FileList | null) {
+    if (!list) return;
+    const chosen = Array.from(list);
+    const types = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+      "image/heic",
+      "image/heif",
+    ];
+    if (chosen.length + files.length > 5) {
+      setError("Можно приложить до 5 файлов.");
+      return;
+    }
+    if (
+      chosen.some(
+        (f) => !types.includes(f.type) || f.size > 10485760 || f.size === 0,
+      )
+    ) {
+      setError("Принимаем PDF, JPG, PNG, WEBP, GIF и HEIC до 10 МБ каждый.");
+      return;
+    }
+    setFiles([...files, ...chosen]);
+    setError("");
+  }
+  if (success)
+    return (
+      <div className="form-success" role="status">
+        <div className="success-icon">
+          <Check size={34} />
+        </div>
+        <p className="eyebrow">ПЕРВЫЙ ШАГ СДЕЛАН</p>
+        <h3>
+          Ваша история
+          <br />
+          начинается здесь.
+        </h3>
+        <p>Заявка сохранена. Мы изучим ваши пожелания и свяжемся с вами.</p>
+        <small>Номер заявки: {success.slice(0, 8).toUpperCase()}</small>
+        <button
+          className="text-link"
+          onClick={() => {
+            setSuccess("");
+            submissionId.current = "";
+            clearCalculation();
+          }}
+        >
+          Отправить ещё одну заявку ↗
+        </button>
+      </div>
+    );
+  return (
+    <form
+      className="lead-form"
+      onSubmit={submit}
+      onFocus={() => {
+        if (!started.current) {
+          track("form_start");
+          started.current = true;
+        }
+      }}
+    >
+      {calculation && (
+        <div className="attached-calculation">
+          <div>
+            <span>Расчёт прикреплён к заявке</span>
+            <strong>
+              {calculation.area} м² · от {money(estimate(calculation).total)}
+            </strong>
+            <details>
+              <summary>Параметры расчёта</summary>
+              <p style={{ whiteSpace: "pre-line" }}>
+                {calculatorText(calculation)}
+              </p>
+            </details>
+          </div>
+          <button
+            type="button"
+            aria-label="Убрать расчёт"
+            onClick={clearCalculation}
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+      <div className="field-row">
+        <label>
+          Ваше имя *
+          <input
+            name="name"
+            autoComplete="name"
+            placeholder="Как к вам обращаться"
+            required
+            minLength={2}
+            maxLength={100}
+          />
+        </label>
+        <label>
+          Телефон *
+          <input
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            placeholder="+7 (___) ___-__-__"
+            required
+            minLength={10}
+            maxLength={30}
+          />
+        </label>
+      </div>
+      <div className="field-row">
+        <label>
+          Email *
+          <input
+            name="email"
+            type="email"
+            autoComplete="email"
+            placeholder="mail@example.ru"
+            required
+            maxLength={200}
+          />
+        </label>
+        <label>
+          Город / регион строительства *
+          <input
+            name="region"
+            autoComplete="address-level1"
+            placeholder="Например, Московская область"
+            required
+            minLength={2}
+            maxLength={200}
+          />
+        </label>
+      </div>
+      <fieldset>
+        <legend>Что вы планируете? *</legend>
+        <div className="service-chips">
+          {services.map((s) => (
+            <label className={selected.includes(s) ? "selected" : ""} key={s}>
+              <input
+                type="checkbox"
+                checked={selected.includes(s)}
+                onChange={(e) =>
+                  setSelected(
+                    e.target.checked
+                      ? [...selected, s]
+                      : selected.filter((x) => x !== s),
+                  )
+                }
+              />
+              {s}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <label>
+        Примерная площадь, м²
+        <input
+          key={calculation?.area || "free"}
+          type="number"
+          name="area"
+          min="10"
+          max="10000"
+          defaultValue={calculation?.area}
+          placeholder="Например, 180"
+          readOnly={!!calculation}
+        />
+      </label>
+      <label>
+        Расскажите о проекте
+        <textarea
+          name="comment"
+          rows={3}
+          maxLength={5000}
+          placeholder="Каким вы видите свой дом? Есть ли участок или готовый проект?"
+          defaultValue={initialService ? `Интересует: ${initialService}` : ""}
+        />
+      </label>
+      <div className="honeypot" aria-hidden="true">
+        <label>
+          Ваш сайт
+          <input name="website" tabIndex={-1} autoComplete="off" />
+        </label>
+      </div>
+      <div className="upload-box">
+        <input
+          ref={input}
+          className="visually-hidden"
+          id="attachments"
+          type="file"
+          multiple
+          accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,.heic,.heif"
+          onChange={(e) => {
+            chooseFiles(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        <button type="button" onClick={() => input.current?.click()}>
+          <Paperclip size={19} />
+          <span>
+            Прикрепить проект или референсы
+            <small>До 5 файлов · PDF и изображения · до 10 МБ каждый</small>
+          </span>
+        </button>
+        {files.map((file, i) => (
+          <div className="file-item" key={i}>
+            <span>{file.name}</span>
+            <button
+              type="button"
+              aria-label={"Удалить " + file.name}
+              onClick={() => setFiles(files.filter((_, n) => i !== n))}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        ))}
+      </div>
+      <label className="check consent">
+        <input type="checkbox" name="consent" required />
+        <span>
+          Я согласен с{" "}
+          <a href="/privacy" target="_blank" rel="noreferrer">
+            политикой конфиденциальности
+          </a>{" "}
+          и даю согласие на обработку персональных данных. *
+        </span>
+      </label>
+      {error && (
+        <p role="alert" className="error">
+          {error}
+        </p>
+      )}
+      <button className="button submit" type="submit" disabled={busy}>
+        {busy ? (
+          <>
+            <LoaderCircle className="spin" size={18} />
+            {step}
+          </>
+        ) : (
+          <>
+            Обсудить мой проект <span>↗</span>
+          </>
+        )}
+      </button>
+      <p className="helper">
+        * Обязательные поля. Демонстрационная форма: используйте тестовые
+        контактные данные.
+      </p>
+    </form>
+  );
+}

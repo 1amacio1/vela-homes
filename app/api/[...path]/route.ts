@@ -1,33 +1,482 @@
-import {NextRequest,NextResponse,after} from 'next/server';
-import {cookies} from 'next/headers';
-import {randomBytes,randomUUID} from 'node:crypto';
-import {z} from 'zod';
-import {db,sign,verify,isAdmin,validPassword,limit,sameOrigin,ensure,ApiError,attribution} from '@/lib/server';
-import {calcSchema,estimate,services,calculatorText} from '@/lib/calculator';
-import {sendTelegram} from '@/lib/telegram';
-export const runtime='nodejs';
-export const dynamic='force-dynamic';
-export const maxDuration=60;
-const json=(value:unknown,status=200)=>NextResponse.json(value,{status,headers:{'Cache-Control':'no-store'}});
-const fileSchema=z.object({name:z.string().min(1).max(180),type:z.enum(['application/pdf','image/jpeg','image/png','image/webp','image/gif','image/heic','image/heif']),size:z.number().int().min(1).max(10485760)});
-const tracking=z.object({sessionId:z.string().uuid().optional(),visitorId:z.string().uuid().optional()});
-function period(value:string){const now=new Date(),ms=86400000;const moscow=new Date(now.getTime()+3*3600000);const midnight=Date.UTC(moscow.getUTCFullYear(),moscow.getUTCMonth(),moscow.getUTCDate())-3*3600000;let start=midnight,end=now.getTime()+1000;if(value==='yesterday'){start-=ms;end=midnight}else if(value==='7d')start-=6*ms;else if(value==='30d')start-=29*ms;else if(value==='month')start=Date.UTC(moscow.getUTCFullYear(),moscow.getUTCMonth(),1)-3*3600000;else if(value==='year')start=Date.UTC(moscow.getUTCFullYear(),0,1)-3*3600000;return {start:new Date(start).toISOString(),end:new Date(end).toISOString()}}
-async function handle(req:NextRequest,path:string){const d=db();if(req.method==='POST')sameOrigin(req);
-if(path==='login'&&req.method==='POST'){await limit(req,'login',8,900);const b=z.object({email:z.string().max(150),password:z.string().max(200)}).parse(await req.json());if(!validPassword(b.password)||b.email.toLowerCase()!==process.env.ADMIN_EMAIL?.toLowerCase())throw new ApiError('Неверный логин или пароль',401);const c=await cookies();c.set('vela_admin',await sign({role:'admin'},'admin'),{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'strict',path:'/',maxAge:43200});return json({ok:true})}
-if(path==='logout'&&req.method==='POST'){(await cookies()).delete('vela_admin');return json({ok:true})}
-if(path==='track'&&req.method==='POST'){if(await isAdmin())return json({ok:true,ignored:true});await limit(req,'track',180,60);const b=z.object({visitorId:z.string().uuid(),sessionId:z.string().uuid(),name:z.enum(['page_view','cta_click','phone_click','email_click','calculator_change','project_view','form_start']),detail:z.string().max(200).optional(),source:z.string().max(200).optional(),landing:z.string().max(400).optional(),utm:z.record(z.string().max(30),z.string().max(150)).optional()}).parse(await req.json());ensure(await d.from('vela_visitors').upsert({id:b.visitorId},{onConflict:'id',ignoreDuplicates:true}));const att=await attribution();ensure(await d.from('vela_sessions').upsert({id:b.sessionId,visitor_id:b.visitorId,source:att.ref_code?'Реферальная ссылка':b.source||'Прямой переход',ref_code:att.ref_code,utm:b.utm||{},landing:b.landing||'/'},{onConflict:'id',ignoreDuplicates:true}));const owned=await d.from('vela_sessions').select('visitor_id').eq('id',b.sessionId).single();if(owned.data?.visitor_id!==b.visitorId)throw new ApiError('Сессия недействительна',400);ensure(await d.from('vela_events').insert({session_id:b.sessionId,visitor_id:b.visitorId,name:b.name,detail:b.detail||null}));return json({ok:true})}
-if(path==='uploads'&&req.method==='POST'){await limit(req,'upload',12,3600);const b=z.object({files:z.array(fileSchema).min(1).max(5)}).parse(await req.json());const batch=randomUUID();const files=await Promise.all(b.files.map(async(f)=>{const ext=({ 'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif','image/heic':'heic','image/heif':'heif'} as Record<string,string>)[f.type];const path=`${batch}/${randomUUID()}.${ext}`;const data=ensure(await d.storage.from('vela-attachments').createSignedUploadUrl(path));return {...f,path,url:data!.signedUrl}}));return json({files,receipt:await sign({files:files.map(({url,...f})=>f)},'uploads','2h')})}
-if(path==='leads'&&req.method==='POST'){await limit(req,'lead',10,3600);const b=z.object({id:z.string().uuid(),name:z.string().trim().min(2).max(100),phone:z.string().trim().min(8).max(30).refine(v=>/^\+?[\d\s()\-]+$/.test(v)&&v.replace(/\D/g,'').length>=10,'Проверьте телефон'),email:z.email().max(200),region:z.string().trim().min(2).max(200),services:z.array(z.enum(services)).min(1).max(5),area:z.number().min(10).max(10000).nullable(),comment:z.string().max(5000),calculator:calcSchema.nullable(),consent:z.literal(true),website:z.string().max(0),receipt:z.string().max(8000).optional(),...tracking.shape}).parse(await req.json());
-const existing=await d.from('vela_leads').select('id').eq('id',b.id).maybeSingle();if(existing.data)return json({ok:true,id:b.id});
-let files:{name:string,type:string,size:number,path:string}[]=[];if(b.receipt){const claims=await verify(b.receipt,'uploads');if(!claims||!Array.isArray(claims.files))throw new ApiError('Срок загрузки файлов истёк. Выберите их повторно.');files=z.array(fileSchema.extend({path:z.string().regex(/^[a-f0-9-]+\/[a-f0-9-]+\.(pdf|jpg|png|webp|gif|heic|heif)$/)})).max(5).parse(claims.files);for(const f of files){const {data,error}=await d.storage.from('vela-attachments').info(f.path);if(error||!data||Number(data.size)!==f.size||data.contentType!==f.type)throw new ApiError('Не все файлы загружены. Повторите отправку.')}}
-const att=await attribution(b.sessionId,b.visitorId);ensure(await d.from('vela_leads').insert({id:b.id,name:b.name,phone:b.phone,email:b.email,region:b.region,services:b.services,area:b.area,comment:b.comment,calculator:b.calculator?{...b.calculator,estimate:estimate(b.calculator)}:null,files,...att}));after(async()=>{await sendTelegram(b.id)});return json({ok:true,id:b.id},201)}
-if(path.startsWith('admin/')){if(!await isAdmin())throw new ApiError('Требуется вход',401);
-if(path==='admin/data'){const p=period(req.nextUrl.searchParams.get('period')||'7d');const page=Math.max(0,Number(req.nextUrl.searchParams.get('page'))||0);const [stats,leads,refs]=await Promise.all([d.rpc('vela_analytics',{p_start:p.start,p_end:p.end}),d.from('vela_leads').select('*',{count:'exact'}).gte('created_at',p.start).lt('created_at',p.end).order('created_at',{ascending:false}).range(page*25,page*25+24),d.rpc('vela_referral_stats')]);return json({analytics:ensure(stats),leads:ensure(leads),total:leads.count,referrals:ensure(refs),period:p,telegramConfigured:!!(process.env.TELEGRAM_BOT_TOKEN&&process.env.TELEGRAM_CHAT_ID),metrikaConfigured:!!process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID,siteUrl:process.env.NEXT_PUBLIC_SITE_URL})}
-if(path==='admin/referrals'&&req.method==='POST'){const b=z.object({name:z.string().trim().min(2).max(100)}).parse(await req.json());const code=randomBytes(5).toString('base64url');ensure(await d.from('vela_referrals').insert({code,name:b.name}));return json({ok:true,code})}
-if(path==='admin/file'){const id=z.string().uuid().parse(req.nextUrl.searchParams.get('id'));const path=req.nextUrl.searchParams.get('path');const lead=ensure(await d.from('vela_leads').select('files').eq('id',id).single());if(!lead?.files?.some((f:{path:string})=>f.path===path))throw new ApiError('Файл не найден',404);const data=ensure(await d.storage.from('vela-attachments').createSignedUrl(path!,60,{download:true}));return NextResponse.redirect(data!.signedUrl)}
-if(path==='admin/retry'&&req.method==='POST'){const b=z.object({id:z.string().uuid()}).parse(await req.json());return json(await sendTelegram(b.id))}
-if(path==='admin/export'){const {default:ExcelJS}=await import('exceljs');const workbook=new ExcelJS.Workbook();const sheet=workbook.addWorksheet('Заявки VELA');const headers=['ID','Дата (Москва)','Имя','Телефон','Email','Регион','Услуги','Площадь, м²','Комментарий','Калькулятор','Калькулятор JSON','Файлы JSON','Источник','Реферальный код','Название реферала','UTM JSON','Сессия','Посетитель','Согласие','Версия согласия','Telegram','Ошибка Telegram','ID сообщения Telegram'];sheet.addRow(headers);const refs=ensure(await d.from('vela_referrals').select('code,name'))||[];let offset=0;while(true){const leads=ensure(await d.from('vela_leads').select('*').order('created_at',{ascending:false}).range(offset,offset+999))||[];for(const l of leads)sheet.addRow([l.id,new Date(l.created_at).toLocaleString('ru-RU',{timeZone:'Europe/Moscow'}),l.name,l.phone,l.email,l.region,l.services.join(', '),l.area,l.comment,l.calculator?calculatorText(l.calculator):'',JSON.stringify(l.calculator),JSON.stringify(l.files),l.source,l.ref_code,refs.find(r=>r.code===l.ref_code)?.name||'',JSON.stringify(l.utm),l.session_id,l.visitor_id,l.consent_at,l.consent_version,l.telegram_status,l.telegram_error,l.telegram_message_id]);offset+=leads.length;if(leads.length<1000)break}sheet.getRow(1).font={bold:true,color:{argb:'FFFFFFFF'}};sheet.getRow(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF202820'}};sheet.columns.forEach((c,i)=>{c.width=i===8||i===9?60:26});sheet.views=[{state:'frozen',ySplit:1}];sheet.autoFilter={from:'A1',to:'W1'};return new Response(new Uint8Array(await workbook.xlsx.writeBuffer()),{headers:{'Content-Type':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','Content-Disposition':'attachment; filename="vela-leads.xlsx"','Cache-Control':'no-store'}})}
+import { NextRequest, NextResponse, after } from "next/server";
+import { cookies } from "next/headers";
+import { randomBytes, randomUUID } from "node:crypto";
+import { z } from "zod";
+import {
+  db,
+  sign,
+  verify,
+  isAdmin,
+  validPassword,
+  limit,
+  sameOrigin,
+  ensure,
+  ApiError,
+  attribution,
+} from "@/lib/server";
+import {
+  calcSchema,
+  estimate,
+  services,
+  calculatorText,
+} from "@/lib/calculator";
+import { sendTelegram } from "@/lib/telegram";
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const maxDuration = 60;
+const json = (value: unknown, status = 200) =>
+  NextResponse.json(value, {
+    status,
+    headers: { "Cache-Control": "no-store" },
+  });
+const fileSchema = z.object({
+  name: z.string().min(1).max(180),
+  type: z.enum([
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+    "image/heic",
+    "image/heif",
+  ]),
+  size: z.number().int().min(1).max(10485760),
+});
+const tracking = z.object({
+  sessionId: z.string().uuid().optional(),
+  visitorId: z.string().uuid().optional(),
+});
+function period(value: string) {
+  const now = new Date(),
+    ms = 86400000;
+  const moscow = new Date(now.getTime() + 3 * 3600000);
+  const midnight =
+    Date.UTC(
+      moscow.getUTCFullYear(),
+      moscow.getUTCMonth(),
+      moscow.getUTCDate(),
+    ) -
+    3 * 3600000;
+  let start = midnight,
+    end = now.getTime() + 1000;
+  if (value === "yesterday") {
+    start -= ms;
+    end = midnight;
+  } else if (value === "7d") start -= 6 * ms;
+  else if (value === "30d") start -= 29 * ms;
+  else if (value === "month")
+    start =
+      Date.UTC(moscow.getUTCFullYear(), moscow.getUTCMonth(), 1) - 3 * 3600000;
+  else if (value === "year")
+    start = Date.UTC(moscow.getUTCFullYear(), 0, 1) - 3 * 3600000;
+  return {
+    start: new Date(start).toISOString(),
+    end: new Date(end).toISOString(),
+  };
 }
-throw new ApiError('Не найдено',404)}
-async function route(req:NextRequest,ctx:{params:Promise<{path:string[]}>}){try{if(Number(req.headers.get('content-length')||0)>50000)throw new ApiError('Слишком большой запрос',413);return await handle(req,(await ctx.params).path.join('/'))}catch(e){if(e instanceof z.ZodError)return json({error:'Проверьте обязательные поля и формат данных.'},400);if(e instanceof ApiError)return json({error:e.message},e.status);console.error('VELA request failed',e instanceof Error?e.name:'unknown');return json({error:'Сервис временно недоступен. Попробуйте ещё раз.'},500)}}
-export {route as GET,route as POST};
+async function handle(req: NextRequest, path: string) {
+  const d = db();
+  if (req.method === "POST") sameOrigin(req);
+  if (path === "login" && req.method === "POST") {
+    await limit(req, "login", 8, 900);
+    const b = z
+      .object({ email: z.string().max(150), password: z.string().max(200) })
+      .parse(await req.json());
+    if (
+      !validPassword(b.password) ||
+      b.email.toLowerCase() !== process.env.ADMIN_EMAIL?.toLowerCase()
+    )
+      throw new ApiError("Неверный логин или пароль", 401);
+    const c = await cookies();
+    c.set("vela_admin", await sign({ role: "admin" }, "admin"), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 43200,
+    });
+    return json({ ok: true });
+  }
+  if (path === "logout" && req.method === "POST") {
+    (await cookies()).delete("vela_admin");
+    return json({ ok: true });
+  }
+  if (path === "track" && req.method === "POST") {
+    if (await isAdmin()) return json({ ok: true, ignored: true });
+    await limit(req, "track", 180, 60);
+    const b = z
+      .object({
+        visitorId: z.string().uuid(),
+        sessionId: z.string().uuid(),
+        name: z.enum([
+          "page_view",
+          "cta_click",
+          "phone_click",
+          "email_click",
+          "calculator_change",
+          "project_view",
+          "form_start",
+        ]),
+        detail: z.string().max(200).optional(),
+        source: z.string().max(200).optional(),
+        landing: z.string().max(400).optional(),
+        utm: z.record(z.string().max(30), z.string().max(150)).optional(),
+      })
+      .parse(await req.json());
+    ensure(
+      await d
+        .from("vela_visitors")
+        .upsert(
+          { id: b.visitorId },
+          { onConflict: "id", ignoreDuplicates: true },
+        ),
+    );
+    const att = await attribution();
+    ensure(
+      await d
+        .from("vela_sessions")
+        .upsert(
+          {
+            id: b.sessionId,
+            visitor_id: b.visitorId,
+            source: att.ref_code
+              ? "Реферальная ссылка"
+              : b.source || "Прямой переход",
+            ref_code: att.ref_code,
+            utm: b.utm || {},
+            landing: b.landing || "/",
+          },
+          { onConflict: "id", ignoreDuplicates: true },
+        ),
+    );
+    const owned = await d
+      .from("vela_sessions")
+      .select("visitor_id")
+      .eq("id", b.sessionId)
+      .single();
+    if (owned.data?.visitor_id !== b.visitorId)
+      throw new ApiError("Сессия недействительна", 400);
+    ensure(
+      await d
+        .from("vela_events")
+        .insert({
+          session_id: b.sessionId,
+          visitor_id: b.visitorId,
+          name: b.name,
+          detail: b.detail || null,
+        }),
+    );
+    return json({ ok: true });
+  }
+  if (path === "uploads" && req.method === "POST") {
+    await limit(req, "upload", 12, 3600);
+    const b = z
+      .object({ files: z.array(fileSchema).min(1).max(5) })
+      .parse(await req.json());
+    const batch = randomUUID();
+    const files = await Promise.all(
+      b.files.map(async (f) => {
+        const ext = (
+          {
+            "application/pdf": "pdf",
+            "image/jpeg": "jpg",
+            "image/png": "png",
+            "image/webp": "webp",
+            "image/gif": "gif",
+            "image/heic": "heic",
+            "image/heif": "heif",
+          } as Record<string, string>
+        )[f.type];
+        const path = `${batch}/${randomUUID()}.${ext}`;
+        const data = ensure(
+          await d.storage.from("vela-attachments").createSignedUploadUrl(path),
+        );
+        return { ...f, path, url: data!.signedUrl };
+      }),
+    );
+    return json({
+      files,
+      receipt: await sign(
+        { files: files.map(({ url, ...f }) => f) },
+        "uploads",
+        "2h",
+      ),
+    });
+  }
+  if (path === "leads" && req.method === "POST") {
+    await limit(req, "lead", 10, 3600);
+    const b = z
+      .object({
+        id: z.string().uuid(),
+        name: z.string().trim().min(2).max(100),
+        phone: z
+          .string()
+          .trim()
+          .min(8)
+          .max(30)
+          .refine(
+            (v) =>
+              /^\+?[\d\s()\-]+$/.test(v) && v.replace(/\D/g, "").length >= 10,
+            "Проверьте телефон",
+          ),
+        email: z.email().max(200),
+        region: z.string().trim().min(2).max(200),
+        services: z.array(z.enum(services)).min(1).max(5),
+        area: z.number().min(10).max(10000).nullable(),
+        comment: z.string().max(5000),
+        calculator: calcSchema.nullable(),
+        consent: z.literal(true),
+        website: z.string().max(0),
+        receipt: z.string().max(8000).optional(),
+        source: z.string().max(200).optional(),
+        utm: z.record(z.string().max(30), z.string().max(150)).optional(),
+        ...tracking.shape,
+      })
+      .parse(await req.json());
+    const existing = await d
+      .from("vela_leads")
+      .select("id")
+      .eq("id", b.id)
+      .maybeSingle();
+    if (existing.data) return json({ ok: true, id: b.id });
+    let files: { name: string; type: string; size: number; path: string }[] =
+      [];
+    if (b.receipt) {
+      const claims = await verify(b.receipt, "uploads");
+      if (!claims || !Array.isArray(claims.files))
+        throw new ApiError("Срок загрузки файлов истёк. Выберите их повторно.");
+      files = z
+        .array(
+          fileSchema.extend({
+            path: z
+              .string()
+              .regex(
+                /^[a-f0-9-]+\/[a-f0-9-]+\.(pdf|jpg|png|webp|gif|heic|heif)$/,
+              ),
+          }),
+        )
+        .max(5)
+        .parse(claims.files);
+      for (const f of files) {
+        const { data, error } = await d.storage
+          .from("vela-attachments")
+          .info(f.path);
+        if (
+          error ||
+          !data ||
+          Number(data.size) !== f.size ||
+          data.contentType !== f.type
+        )
+          throw new ApiError("Не все файлы загружены. Повторите отправку.");
+      }
+    }
+    const att = await attribution(b.sessionId, b.visitorId);
+    if (!att.session_id) {
+      if (!att.ref_code && b.source) att.source = b.source;
+      att.utm = b.utm || {};
+    }
+    ensure(
+      await d
+        .from("vela_leads")
+        .insert({
+          id: b.id,
+          name: b.name,
+          phone: b.phone,
+          email: b.email,
+          region: b.region,
+          services: b.services,
+          area: b.area,
+          comment: b.comment,
+          calculator: b.calculator
+            ? { ...b.calculator, estimate: estimate(b.calculator) }
+            : null,
+          files,
+          ...att,
+        }),
+    );
+    after(async () => {
+      await sendTelegram(b.id);
+    });
+    return json({ ok: true, id: b.id }, 201);
+  }
+  if (path.startsWith("admin/")) {
+    if (!(await isAdmin())) throw new ApiError("Требуется вход", 401);
+    if (path === "admin/data") {
+      const p = period(req.nextUrl.searchParams.get("period") || "7d");
+      const page = Math.max(
+        0,
+        Number(req.nextUrl.searchParams.get("page")) || 0,
+      );
+      const [stats, leads, refs] = await Promise.all([
+        d.rpc("vela_analytics", { p_start: p.start, p_end: p.end }),
+        d
+          .from("vela_leads")
+          .select("*", { count: "exact" })
+          .gte("created_at", p.start)
+          .lt("created_at", p.end)
+          .order("created_at", { ascending: false })
+          .range(page * 25, page * 25 + 24),
+        d.rpc("vela_referral_stats"),
+      ]);
+      return json({
+        analytics: ensure(stats),
+        leads: ensure(leads),
+        total: leads.count,
+        referrals: ensure(refs),
+        period: p,
+        telegramConfigured: !!(
+          process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID
+        ),
+        metrikaConfigured: !!process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID,
+        siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
+      });
+    }
+    if (path === "admin/referrals" && req.method === "POST") {
+      const b = z
+        .object({ name: z.string().trim().min(2).max(100) })
+        .parse(await req.json());
+      const code = randomBytes(5).toString("base64url");
+      ensure(await d.from("vela_referrals").insert({ code, name: b.name }));
+      return json({ ok: true, code });
+    }
+    if (path === "admin/file") {
+      const id = z.string().uuid().parse(req.nextUrl.searchParams.get("id"));
+      const path = req.nextUrl.searchParams.get("path");
+      const lead = ensure(
+        await d.from("vela_leads").select("files").eq("id", id).single(),
+      );
+      if (!lead?.files?.some((f: { path: string }) => f.path === path))
+        throw new ApiError("Файл не найден", 404);
+      const data = ensure(
+        await d.storage
+          .from("vela-attachments")
+          .createSignedUrl(path!, 60, { download: true }),
+      );
+      return NextResponse.redirect(data!.signedUrl);
+    }
+    if (path === "admin/retry" && req.method === "POST") {
+      const b = z.object({ id: z.string().uuid() }).parse(await req.json());
+      return json(await sendTelegram(b.id));
+    }
+    if (path === "admin/export") {
+      const { default: ExcelJS } = await import("exceljs");
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet("Заявки VELA");
+      const headers = [
+        "ID",
+        "Дата (Москва)",
+        "Имя",
+        "Телефон",
+        "Email",
+        "Регион",
+        "Услуги",
+        "Площадь, м²",
+        "Комментарий",
+        "Калькулятор",
+        "Калькулятор JSON",
+        "Файлы JSON",
+        "Источник",
+        "Реферальный код",
+        "Название реферала",
+        "UTM JSON",
+        "Сессия",
+        "Посетитель",
+        "Согласие",
+        "Версия согласия",
+        "Telegram",
+        "Ошибка Telegram",
+        "ID сообщения Telegram",
+      ];
+      sheet.addRow(headers);
+      const refs =
+        ensure(await d.from("vela_referrals").select("code,name")) || [];
+      let offset = 0;
+      while (true) {
+        const leads =
+          ensure(
+            await d
+              .from("vela_leads")
+              .select("*")
+              .order("created_at", { ascending: false })
+              .range(offset, offset + 999),
+          ) || [];
+        for (const l of leads)
+          sheet.addRow([
+            l.id,
+            new Date(l.created_at).toLocaleString("ru-RU", {
+              timeZone: "Europe/Moscow",
+            }),
+            l.name,
+            l.phone,
+            l.email,
+            l.region,
+            l.services.join(", "),
+            l.area,
+            l.comment,
+            l.calculator ? calculatorText(l.calculator) : "",
+            JSON.stringify(l.calculator),
+            JSON.stringify(l.files),
+            l.source,
+            l.ref_code,
+            refs.find((r) => r.code === l.ref_code)?.name || "",
+            JSON.stringify(l.utm),
+            l.session_id,
+            l.visitor_id,
+            l.consent_at,
+            l.consent_version,
+            l.telegram_status,
+            l.telegram_error,
+            l.telegram_message_id,
+          ]);
+        offset += leads.length;
+        if (leads.length < 1000) break;
+      }
+      sheet.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
+      sheet.getRow(1).fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF202820" },
+      };
+      sheet.columns.forEach((c, i) => {
+        c.width = i === 8 || i === 9 ? 60 : 26;
+      });
+      sheet.views = [{ state: "frozen", ySplit: 1 }];
+      sheet.autoFilter = { from: "A1", to: "W1" };
+      return new Response(new Uint8Array(await workbook.xlsx.writeBuffer()), {
+        headers: {
+          "Content-Type":
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "Content-Disposition": 'attachment; filename="vela-leads.xlsx"',
+          "Cache-Control": "no-store",
+        },
+      });
+    }
+  }
+  throw new ApiError("Не найдено", 404);
+}
+async function route(
+  req: NextRequest,
+  ctx: { params: Promise<{ path: string[] }> },
+) {
+  try {
+    if (Number(req.headers.get("content-length") || 0) > 50000)
+      throw new ApiError("Слишком большой запрос", 413);
+    return await handle(req, (await ctx.params).path.join("/"));
+  } catch (e) {
+    if (e instanceof z.ZodError)
+      return json(
+        { error: "Проверьте обязательные поля и формат данных." },
+        400,
+      );
+    if (e instanceof ApiError) return json({ error: e.message }, e.status);
+    console.error(
+      "VELA request failed",
+      e instanceof Error ? e.name : "unknown",
+    );
+    return json(
+      { error: "Сервис временно недоступен. Попробуйте ещё раз." },
+      500,
+    );
+  }
+}
+export { route as GET, route as POST };
