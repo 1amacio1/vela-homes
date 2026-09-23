@@ -201,7 +201,7 @@ export default function Home() {
             <h2>
               Строим так,
               <br />
-              как строили бы
+              как строили бы{" "}
               <br />
               <span className="title-accent">для себя.</span>
             </h2>
