@@ -1,4 +1,5 @@
 "use client";
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { createId } from "@/lib/id";
 import { useRef, useState } from "react";
 import { Paperclip, Check, LoaderCircle, X } from "lucide-react";
@@ -165,7 +166,7 @@ export default function LeadForm({
             clearCalculation();
           }}
         >
-          Отправить ещё одну заявку ↗
+          Отправить ещё одну заявку <DirectionIcon />
         </button>
       </div>
     );
@@ -358,7 +359,7 @@ export default function LeadForm({
           </>
         ) : (
           <>
-            Обсудить мой проект <span>↗</span>
+            Обсудить мой проект <DirectionIcon />
           </>
         )}
       </button>

@@ -1,4 +1,5 @@
 "use client";
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { useState } from "react";
 import { projects, photo, Project } from "@/lib/content";
 import { track } from "@/lib/tracking";
@@ -22,7 +23,9 @@ export function ProjectCard({
           loading="lazy"
         />
         <span className="project-label">{project.tag}</span>
-        <span className="circle-arrow">↗</span>
+        <span className="circle-arrow">
+          <DirectionIcon />
+        </span>
       </div>
       <div className="project-title">
         <h3>{project.name}</h3>

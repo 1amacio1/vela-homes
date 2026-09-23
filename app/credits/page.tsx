@@ -1,3 +1,4 @@
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { Header, Footer } from "@/components/Chrome";
 import credits from "@/PHOTO_CREDITS.json";
 export const metadata = { title: "О демонстрационном проекте — VELA" };
@@ -10,7 +11,7 @@ export default function Page() {
         <h1>
           Архитектура
           <br />
-          <em>вдохновения.</em>
+          <span className="title-accent">вдохновения.</span>
         </h1>
         <p>
           Сайт демонстрирует работу строительной компании по заданному сценарию.
@@ -52,7 +53,7 @@ export default function Page() {
           Работы без заданных ставок вынесены на индивидуальный расчёт.
         </p>
         <a className="text-link" href="/">
-          ← Вернуться на сайт
+          <DirectionIcon direction="left" /> Вернуться на сайт
         </a>
       </main>
       <Footer />

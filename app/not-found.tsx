@@ -1,3 +1,4 @@
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { Header, Footer } from "@/components/Chrome";
 export default function NotFound() {
   return (
@@ -8,10 +9,10 @@ export default function NotFound() {
         <h1>
           Здесь пока
           <br />
-          <em>ничего не построено.</em>
+          <span className="title-accent">ничего не построено.</span>
         </h1>
         <a className="button" href="/">
-          На главную ↗
+          На главную <DirectionIcon />
         </a>
       </main>
       <Footer />

@@ -1,3 +1,4 @@
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { Header, Footer, Analytics } from "@/components/Chrome";
 import { Catalog } from "@/components/Projects";
 export const metadata = { title: "Проекты домов — VELA" };
@@ -9,7 +10,7 @@ export default function Page() {
         <p className="eyebrow">ПОРТФОЛИО / 12 ИСТОРИЙ</p>
         <div className="section-heading">
           <h1>
-            Найдите <em>свой характер.</em>
+            Найдите <span className="title-accent">свой характер.</span>
           </h1>
           <p>
             Современные дома, продуманные интерьеры
@@ -24,10 +25,12 @@ export default function Page() {
         </p>
         <div className="catalog-end">
           <h2>
-            Ваш дом будет <em>вашим.</em>
+            Спроектируем дом
+            <br />
+            <span className="title-accent">под ваш образ жизни.</span>
           </h2>
           <a className="button" href="/#contact">
-            Обсудить индивидуальный проект ↗
+            Обсудить индивидуальный проект <DirectionIcon />
           </a>
         </div>
       </main>

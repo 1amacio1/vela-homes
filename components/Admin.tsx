@@ -1,7 +1,7 @@
 "use client";
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { useEffect, useState, useCallback } from "react";
 import {
-  ArrowUpRight,
   Download,
   LogOut,
   ChartNoAxesCombined,
@@ -209,7 +209,7 @@ export default function Admin({ authenticated }: { authenticated: boolean }) {
           <h1>
             Всё под
             <br />
-            <em>контролем.</em>
+            <span className="title-accent">контролем.</span>
           </h1>
           <label>
             Логин
@@ -237,10 +237,10 @@ export default function Admin({ authenticated }: { authenticated: boolean }) {
             </p>
           )}
           <button className="button" disabled={busy}>
-            {busy ? "Проверяем…" : "Войти"} <ArrowUpRight size={18} />
+            {busy ? "Проверяем…" : "Войти"} <DirectionIcon size={18} />
           </button>
           <a className="back-link" href="/">
-            ← Вернуться на сайт
+            <DirectionIcon direction="left" /> Вернуться на сайт
           </a>
         </form>
         <span className="login-caption">VELA / УПРАВЛЕНИЕ САЙТОМ</span>
@@ -280,7 +280,7 @@ export default function Admin({ authenticated }: { authenticated: boolean }) {
         </nav>
         <div className="admin-sidebar-bottom">
           <a href="/" target="_blank" rel="noreferrer">
-            Открыть сайт ↗
+            Открыть сайт <DirectionIcon />
           </a>
           <button
             onClick={async () => {
@@ -600,7 +600,7 @@ export default function Admin({ authenticated }: { authenticated: boolean }) {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Открыть форму заявки ↗
+                  Открыть форму заявки <DirectionIcon />
                 </a>
               </div>
             ) : (
@@ -721,13 +721,13 @@ export default function Admin({ authenticated }: { authenticated: boolean }) {
             )}
             <div className="pagination">
               <button disabled={page === 0} onClick={() => setPage(page - 1)}>
-                ← Назад
+                <DirectionIcon direction="left" /> Назад
               </button>
               <button
                 disabled={(page + 1) * 25 >= data.total}
                 onClick={() => setPage(page + 1)}
               >
-                Далее →
+                Далее <DirectionIcon direction="right" />
               </button>
             </div>
           </>
@@ -753,7 +753,7 @@ export default function Admin({ authenticated }: { authenticated: boolean }) {
                 />
               </label>
               <button className="button" disabled={busy}>
-                Создать ссылку <ArrowUpRight size={18} />
+                Создать ссылку <DirectionIcon size={18} />
               </button>
             </form>
             <div className="admin-panel">

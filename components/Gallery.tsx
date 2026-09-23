@@ -1,6 +1,7 @@
 "use client";
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { useRef, useState, useEffect } from "react";
-import { X, ArrowLeft, ArrowRight } from "lucide-react";
+import { X } from "lucide-react";
 import { photo } from "@/lib/content";
 export default function Gallery({
   images,
@@ -34,7 +35,10 @@ export default function Gallery({
           >
             <img src={photo(im.id)} alt={im.label} loading="lazy" />
             <span>
-              {im.label} <span>Увеличить ↗</span>
+              {im.label}{" "}
+              <span>
+                Увеличить <DirectionIcon />
+              </span>
             </span>
           </button>
         ))}
@@ -56,13 +60,13 @@ export default function Gallery({
         <img src={photo(images[active].id)} alt={images[active].label} />
         <div>
           <button aria-label="Предыдущее фото" onClick={() => next(-1)}>
-            <ArrowLeft />
+            <DirectionIcon direction="left" />
           </button>
           <span>
             {images[active].label} · {active + 1} / {images.length}
           </span>
           <button aria-label="Следующее фото" onClick={() => next(1)}>
-            <ArrowRight />
+            <DirectionIcon direction="right" />
           </button>
         </div>
       </dialog>

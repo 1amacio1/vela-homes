@@ -1,6 +1,7 @@
 "use client";
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { useState } from "react";
-import { ArrowUpRight, ArrowLeft, ArrowRight } from "lucide-react";
+
 import { Header, Footer, Analytics } from "./Chrome";
 import { ProjectCard } from "./Projects";
 import Calculator from "./Calculator";
@@ -56,7 +57,7 @@ export default function Home() {
             <h1>
               Место, где
               <br />
-              начинается <em>ваша жизнь.</em>
+              начинается <span className="title-accent">ваша жизнь.</span>
             </h1>
             <p className="hero-sub">
               VELA. Строительство домов по всей России.
@@ -69,14 +70,14 @@ export default function Home() {
                 href="#calculator"
                 onClick={() => track("cta_click", "Рассчитать стоимость")}
               >
-                Рассчитать стоимость <span>↗</span>
+                Рассчитать стоимость <DirectionIcon />
               </a>
               <a
                 className="text-link"
                 href="#projects"
                 onClick={() => track("cta_click", "Смотреть проекты")}
               >
-                Смотреть проекты <ArrowUpRight size={18} />
+                Смотреть проекты <DirectionIcon size={18} />
               </a>
             </div>
           </div>
@@ -85,10 +86,15 @@ export default function Home() {
             <span>
               АРХИТЕКТУРА &nbsp; · &nbsp; ИНТЕРЬЕР &nbsp; · &nbsp; ЛАНДШАФТ
             </span>
-            <a href="#projects">ЛИСТАЙТЕ ВНИЗ ↓</a>
+            <a href="#projects">
+              ЛИСТАЙТЕ ВНИЗ <DirectionIcon direction="down" />
+            </a>
           </div>
           <a className="hero-project" href="/projects/gorizont">
-            Горизонт <span>280 м² / Смотреть проект ↗</span>
+            Горизонт{" "}
+            <span>
+              280 м² / Смотреть проект <DirectionIcon />
+            </span>
           </a>
         </section>
         <section className="section" id="projects">
@@ -100,7 +106,7 @@ export default function Home() {
             <h2>
               Архитектура.
               <br />
-              <em>С характером.</em>
+              <span className="title-accent">С характером.</span>
             </h2>
             <div>
               <p>
@@ -109,7 +115,10 @@ export default function Home() {
                 Следующая может стать вашей.
               </p>
               <a className="text-link" href="/projects">
-                Все проекты <span>12 ↗</span>
+                Все проекты{" "}
+                <span>
+                  12 <DirectionIcon />
+                </span>
               </a>
             </div>
           </div>
@@ -132,7 +141,7 @@ export default function Home() {
             <h2>
               От идеи
               <br />
-              <em>до ощущения дома.</em>
+              <span className="title-accent">до ощущения дома.</span>
             </h2>
             <p>
               Берём на себя весь процесс
@@ -159,7 +168,7 @@ export default function Home() {
                   <h3>{s.title}</h3>
                   {service === i && <p>{s.text}</p>}
                 </div>
-                <ArrowUpRight className="service-arrow" size={25} />
+                <DirectionIcon className="service-arrow" size={25} />
               </button>
             ))}
           </div>
@@ -174,7 +183,7 @@ export default function Home() {
               href="#contact"
               onClick={() => track("cta_click", "Обсудить услуги")}
             >
-              Обсудить задачу ↗
+              Обсудить задачу <DirectionIcon />
             </a>
           </div>
         </section>
@@ -194,7 +203,7 @@ export default function Home() {
               <br />
               как строили бы
               <br />
-              <em>для себя.</em>
+              <span className="title-accent">для себя.</span>
             </h2>
             <p>
               Дом — это большое решение. Мы делаем путь к нему понятным:
@@ -251,21 +260,21 @@ export default function Home() {
             <div>
               <h2>
                 Главное —<br />
-                <em>что остаётся после.</em>
+                <span className="title-accent">что остаётся после.</span>
               </h2>
               <div className="review-controls">
                 <button
                   aria-label="Предыдущий отзыв"
                   onClick={() => setReview((review + 5) % 6)}
                 >
-                  <ArrowLeft size={20} />
+                  <DirectionIcon direction="left" size={20} />
                 </button>
                 <span>0{review + 1} / 06</span>
                 <button
                   aria-label="Следующий отзыв"
                   onClick={() => setReview((review + 1) % 6)}
                 >
-                  <ArrowRight size={20} />
+                  <DirectionIcon direction="right" size={20} />
                 </button>
               </div>
             </div>
@@ -277,7 +286,7 @@ export default function Home() {
                 <div>
                   <strong>{reviews[review].name}</strong>
                   <a href={"/projects/" + reviews[review].slug}>
-                    Дом «{reviews[review].project}» ↗
+                    Дом «{reviews[review].project}» <DirectionIcon />
                   </a>
                 </div>
               </div>
@@ -294,7 +303,7 @@ export default function Home() {
               <h2>
                 Расскажите
                 <br />
-                <em>о вашем доме.</em>
+                <span className="title-accent">о вашем доме.</span>
               </h2>
               <p>
                 Даже если пока есть только идея.
@@ -313,7 +322,7 @@ export default function Home() {
                 href="mailto:hello@vela.example"
                 onClick={() => track("email_click")}
               >
-                hello@vela.example ↗
+                hello@vela.example <DirectionIcon />
               </a>
               <p className="helper">Телефон и email — демонстрационные.</p>
               <div className="address">
@@ -324,7 +333,7 @@ export default function Home() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Открыть маршрут ↗
+                  Открыть маршрут <DirectionIcon />
                 </a>
               </div>
               <iframe

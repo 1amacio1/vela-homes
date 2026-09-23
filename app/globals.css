@@ -6,7 +6,6 @@
   --text: #f3f1eb;
   --muted: #a7ada7;
   --accent: #c4a584;
-  --serif: Georgia, "Times New Roman", serif;
 }
 * {
   box-sizing: border-box;
@@ -112,6 +111,9 @@ button {
   color: var(--accent);
 }
 .header-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   border-bottom: 1px solid #fff8;
   padding: 10px 0;
   font-size: 14px;
@@ -157,10 +159,6 @@ button {
   letter-spacing: -3px;
   margin: 0 0 27px;
   max-width: 1100px;
-}
-.hero h1 em {
-  font-family: var(--serif);
-  font-weight: 400;
 }
 .hero-sub {
   font-size: 16px;
@@ -337,11 +335,12 @@ h2 {
   letter-spacing: -1.8px;
   margin: 0;
 }
-h2 em,
-h1 em {
-  font-family: var(--serif);
-  font-weight: 400;
-  color: #c7b396;
+.title-accent {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 550;
+  letter-spacing: -0.045em;
+  color: var(--accent);
 }
 h1 {
   font-size: clamp(48px, 5vw, 80px);
@@ -846,7 +845,7 @@ input[type="radio"] {
   color: var(--muted);
 }
 .quote-mark {
-  font-family: var(--serif);
+  font-family: inherit;
   color: var(--accent);
   font-size: 80px;
   line-height: 0.8;
@@ -871,7 +870,7 @@ input[type="radio"] {
   place-items: center;
   border-radius: 50%;
   border: 1px solid var(--line);
-  font-family: var(--serif);
+  font-family: inherit;
   color: var(--accent);
   font-size: 20px;
 }
@@ -1089,7 +1088,7 @@ input[type="radio"] {
   color: var(--accent);
 }
 .form-success h3 {
-  font-family: var(--serif);
+  font-family: inherit;
   font-size: 44px;
   font-weight: 400;
   line-height: 1.2;
@@ -2715,5 +2714,59 @@ th {
   }
   .eyebrow {
     font-size: 11px;
+  }
+}
+
+/* Vector directions stay identical on iOS, Android and desktop. */
+.direction-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 1.125rem;
+  height: 1.125rem;
+  vertical-align: -0.2em;
+}
+.button > .direction-icon,
+.circle-arrow > .direction-icon {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+.service-arrow.direction-icon {
+  width: 1.5625rem;
+  height: 1.5625rem;
+}
+.hero-bottom > a,
+.back-link,
+.review-person a,
+.contact-email,
+.address a,
+.gallery-grid > button > span > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.hero-project .direction-icon,
+.hero-bottom .direction-icon,
+.review-person .direction-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.hero-project .direction-icon {
+  margin-left: 0.3rem;
+}
+.catalog-end > h2 {
+  flex: 1 1 auto;
+}
+.catalog-end > .button {
+  flex: 0 1 400px;
+  gap: 1.5rem;
+}
+.pagination button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+@media (max-width: 800px) {
+  .catalog-end > .button {
+    flex: 0 1 auto;
   }
 }

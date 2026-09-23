@@ -1,3 +1,4 @@
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { notFound } from "next/navigation";
 import { Header, Footer, Analytics } from "@/components/Chrome";
 import { ProjectCard } from "@/components/Projects";
@@ -32,14 +33,14 @@ export default async function Page({
       <main className="inner-page">
         <section className="project-intro section">
           <a className="back-link" href="/projects">
-            ← Все проекты
+            <DirectionIcon direction="left" /> Все проекты
           </a>
           <div className="section-heading">
             <div>
               <p className="eyebrow">{p.location}</p>
               <h1>
                 {p.name}
-                <em>.</em>
+                <span className="title-accent">.</span>
               </h1>
             </div>
             <p>{p.description}</p>
@@ -58,7 +59,7 @@ export default async function Page({
               <span>технология строительства</span>
             </div>
             <a className="button" href="/#contact">
-              Хочу похожий дом ↗
+              Хочу похожий дом <DirectionIcon />
             </a>
           </div>
         </section>
@@ -70,7 +71,7 @@ export default async function Page({
         <section className="section project-gallery">
           <div className="section-heading">
             <h2>
-              Продуман <em>целиком.</em>
+              Продуман <span className="title-accent">целиком.</span>
             </h2>
             <div>
               <p className="eyebrow">В ЭТОМ ПРОЕКТЕ ВЫПОЛНЕНО</p>
@@ -109,15 +110,15 @@ export default async function Page({
           </p>
           <div className="catalog-end">
             <h2>
-              Близко <em>по духу?</em>
+              Близко <span className="title-accent">по духу?</span>
             </h2>
             <a className="button" href="/#calculator">
-              Рассчитать свой дом ↗
+              Рассчитать свой дом <DirectionIcon />
             </a>
           </div>
           <div className="section-heading">
             <h2>
-              Другие <em>истории.</em>
+              Другие <span className="title-accent">истории.</span>
             </h2>
           </div>
           <div className="project-grid">

@@ -1,3 +1,4 @@
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { Header, Footer } from "@/components/Chrome";
 export const metadata = { title: "Конфиденциальность — VELA" };
 export default function Page() {
@@ -9,7 +10,7 @@ export default function Page() {
         <h1>
           Конфиденциальность
           <br />
-          <em>и согласие.</em>
+          <span className="title-accent">и согласие.</span>
         </h1>
         <p>
           VELA — демонстрационный сайт строительной компании. Для проверки
@@ -60,7 +61,7 @@ export default function Page() {
           начала приёма реальных обращений.
         </p>
         <a className="text-link" href="/">
-          ← Вернуться на сайт
+          <DirectionIcon direction="left" /> Вернуться на сайт
         </a>
       </main>
       <Footer />

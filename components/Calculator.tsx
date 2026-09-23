@@ -1,4 +1,5 @@
 "use client";
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { useEffect, useRef } from "react";
 import {
   type Calculation,
@@ -52,7 +53,7 @@ export default function Calculator({
       </div>
       <div className="section-heading">
         <h2>
-          Начните с <em>простого расчёта.</em>
+          Начните с <span className="title-accent">простого расчёта.</span>
         </h2>
         <p>
           Выберите параметры будущего дома.
@@ -238,7 +239,7 @@ export default function Calculator({
               onApply();
             }}
           >
-            Обсудить этот расчёт <span>↗</span>
+            Обсудить этот расчёт <DirectionIcon />
           </button>
           <p className="helper">
             Расчёт предварительный. Базовые ставки — ориентир для дома из

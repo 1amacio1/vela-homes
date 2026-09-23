@@ -1,4 +1,5 @@
 "use client";
+import { DirectionIcon } from "@/components/DirectionIcon";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { track, startMetrika } from "@/lib/tracking";
@@ -32,7 +33,7 @@ export function Header({ solid = false }: { solid?: boolean }) {
         href="/#contact"
         onClick={() => track("cta_click", "Обсудить проект")}
       >
-        Обсудить проект ↗
+        Обсудить проект <DirectionIcon />
       </a>
       <button
         className="menu-toggle"
