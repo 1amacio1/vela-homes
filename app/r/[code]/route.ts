@@ -1,0 +1,3 @@
+import {NextRequest,NextResponse} from 'next/server';
+import {db} from '@/lib/server';
+export async function GET(req:NextRequest,{params}:{params:Promise<{code:string}>}){const {code}=await params;const res=NextResponse.redirect(new URL('/',req.url));if(/^[a-zA-Z0-9_-]{6,12}$/.test(code)){const {data}=await db().from('vela_referrals').select('code').eq('code',code).maybeSingle();if(data){res.cookies.set('vela_ref',code,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:2592000});res.cookies.set('vela_new_ref','1',{secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:60})}}return res}
