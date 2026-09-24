@@ -133,21 +133,19 @@ async function handle(req: NextRequest, path: string) {
     );
     const att = await attribution();
     ensure(
-      await d
-        .from("vela_sessions")
-        .upsert(
-          {
-            id: b.sessionId,
-            visitor_id: b.visitorId,
-            source: att.ref_code
-              ? "Реферальная ссылка"
-              : b.source || "Прямой переход",
-            ref_code: att.ref_code,
-            utm: b.utm || {},
-            landing: b.landing || "/",
-          },
-          { onConflict: "id", ignoreDuplicates: true },
-        ),
+      await d.from("vela_sessions").upsert(
+        {
+          id: b.sessionId,
+          visitor_id: b.visitorId,
+          source: att.ref_code
+            ? "Реферальная ссылка"
+            : b.source || "Прямой переход",
+          ref_code: att.ref_code,
+          utm: b.utm || {},
+          landing: b.landing || "/",
+        },
+        { onConflict: "id", ignoreDuplicates: true },
+      ),
     );
     const owned = await d
       .from("vela_sessions")
@@ -157,14 +155,12 @@ async function handle(req: NextRequest, path: string) {
     if (owned.data?.visitor_id !== b.visitorId)
       throw new ApiError("Сессия недействительна", 400);
     ensure(
-      await d
-        .from("vela_events")
-        .insert({
-          session_id: b.sessionId,
-          visitor_id: b.visitorId,
-          name: b.name,
-          detail: b.detail || null,
-        }),
+      await d.from("vela_events").insert({
+        session_id: b.sessionId,
+        visitor_id: b.visitorId,
+        name: b.name,
+        detail: b.detail || null,
+      }),
     );
     return json({ ok: true });
   }
@@ -276,23 +272,21 @@ async function handle(req: NextRequest, path: string) {
       att.utm = b.utm || {};
     }
     ensure(
-      await d
-        .from("vela_leads")
-        .insert({
-          id: b.id,
-          name: b.name,
-          phone: b.phone,
-          email: b.email,
-          region: b.region,
-          services: b.services,
-          area: b.area,
-          comment: b.comment,
-          calculator: b.calculator
-            ? { ...b.calculator, estimate: estimate(b.calculator) }
-            : null,
-          files,
-          ...att,
-        }),
+      await d.from("vela_leads").insert({
+        id: b.id,
+        name: b.name,
+        phone: b.phone,
+        email: b.email,
+        region: b.region,
+        services: b.services,
+        area: b.area,
+        comment: b.comment,
+        calculator: b.calculator
+          ? { ...b.calculator, estimate: estimate(b.calculator) }
+          : null,
+        files,
+        ...att,
+      }),
     );
     after(async () => {
       await sendTelegram(b.id);
@@ -325,7 +319,8 @@ async function handle(req: NextRequest, path: string) {
         referrals: ensure(refs),
         period: p,
         telegramConfigured: !!(
-          process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID
+          process.env.TELEGRAM_BOT_TOKEN &&
+          (process.env.TELEGRAM_OWNER_ID || process.env.TELEGRAM_CHAT_ID)
         ),
         metrikaConfigured: !!process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID,
         siteUrl: process.env.NEXT_PUBLIC_SITE_URL,

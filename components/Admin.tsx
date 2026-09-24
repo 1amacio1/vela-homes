@@ -30,6 +30,7 @@ type Lead = {
   consent_at: string;
   telegram_status: string;
   telegram_error: string | null;
+  telegram_locked_until: string | null;
 };
 type Referral = {
   code: string;
@@ -558,7 +559,10 @@ export default function Admin({ authenticated }: { authenticated: boolean }) {
                     : "Ожидает подключения"}
                 </p>
                 {!data.telegramConfigured && (
-                  <code>TELEGRAM_BOT_TOKEN · TELEGRAM_CHAT_ID</code>
+                  <p>
+                    Главный менеджер управляет получателями через команду
+                    /managers в боте.
+                  </p>
                 )}
               </div>
               <div>
@@ -703,7 +707,10 @@ export default function Admin({ authenticated }: { authenticated: boolean }) {
                           <button
                             disabled={
                               retrying === l.id ||
-                              l.telegram_status === "sending"
+                              (l.telegram_status === "sending" &&
+                                !!l.telegram_locked_until &&
+                                Date.parse(l.telegram_locked_until) >
+                                  Date.now())
                             }
                             className="button small"
                             onClick={() => retry(l.id)}
