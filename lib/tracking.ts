@@ -82,10 +82,14 @@ export function startMetrika() {
   const script = document.createElement("script");
   script.id = "vela-metrika";
   script.async = true;
-  script.src = "https://mc.yandex.ru/metrika/tag.js";
+  script.src = `https://mc.yandex.ru/metrika/tag.js?id=${id}`;
   document.head.appendChild(script);
   ym(Number(id), "init", {
+    ssr: true,
     clickmap: true,
+    ecommerce: "dataLayer",
+    referrer: document.referrer,
+    url: location.href,
     trackLinks: true,
     accurateTrackBounce: true,
     webvisor: true,
