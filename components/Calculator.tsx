@@ -1,6 +1,6 @@
 "use client";
 import { DirectionIcon } from "@/components/DirectionIcon";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   type Calculation,
   estimate,
@@ -33,6 +33,8 @@ export default function Calculator({
   );
   const result = estimate(value),
     changed = useRef(false);
+  const [treesDraft, setTreesDraft] = useState(String(value.trees));
+  useEffect(() => setTreesDraft(String(value.trees)), [value.trees]);
   function update(k: keyof Calculation, v: unknown) {
     changed.current = true;
     onChange({ ...value, [k]: v });
@@ -197,10 +199,23 @@ export default function Calculator({
                   type="number"
                   min="0"
                   max="100"
-                  value={value.trees}
-                  onChange={(e) =>
-                    update("trees", Math.max(0, Math.min(100, +e.target.value)))
-                  }
+                  value={treesDraft}
+                  onFocus={(e) => e.currentTarget.select()}
+                  onChange={(e) => {
+                    const draft = e.target.value;
+                    if (draft === "") {
+                      setTreesDraft("");
+                      return;
+                    }
+                    const trees = Math.max(0, Math.min(100, Number(draft)));
+                    setTreesDraft(String(trees));
+                    update("trees", trees);
+                  }}
+                  onBlur={() => {
+                    if (treesDraft !== "") return;
+                    setTreesDraft("0");
+                    update("trees", 0);
+                  }}
                 />
               </label>
             </div>

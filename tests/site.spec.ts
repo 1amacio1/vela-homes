@@ -8,6 +8,17 @@ test("каталог, калькулятор, адаптивность и защ
   await page.goto("/");
   await page.getByRole("button", { name: "Только необходимые" }).click();
   await page.getByLabel("Площадь дома", { exact: true }).fill("200");
+  const trees = page.getByLabel("Посадка деревьев, шт.");
+  await trees.fill("");
+  await expect(trees).toHaveValue("");
+  await trees.pressSequentially("20");
+  await expect(trees).toHaveValue("20");
+  await page.getByText("Дом и территория", { exact: true }).first().click();
+  await trees.fill("0");
+  await page.getByText("Дом и территория", { exact: true }).first().click();
+  await trees.click();
+  await trees.pressSequentially("15");
+  await expect(trees).toHaveValue("15");
   await page.getByLabel("Дизайн интерьера", { exact: false }).first().check();
   expect(
     (await page.locator(".estimate-total strong").innerText()).replace(
