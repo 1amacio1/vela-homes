@@ -3,6 +3,7 @@ import { DirectionIcon } from "@/components/DirectionIcon";
 import { useEffect, useState } from "react";
 
 import { Header, Footer, Analytics } from "./Chrome";
+import { Intro } from "./Intro";
 import { ProjectCard } from "./Projects";
 import Calculator from "./Calculator";
 import LeadForm from "./LeadForm";
@@ -16,6 +17,7 @@ export default function Home() {
   const [service, setService] = useState<number | null>(null);
   return (
     <>
+      <Intro />
       <Header />
       <main>
         <Hero />

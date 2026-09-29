@@ -34,7 +34,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru" className={`${display.variable} ${text.variable}`}>
+    <html
+      lang="ru"
+      className={`${display.variable} ${text.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         {children}
         <Reveal />
