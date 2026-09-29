@@ -965,15 +965,11 @@ a:hover > .text-link .direction-icon {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transform: scale(1.04);
-  transition:
-    opacity 1s var(--ease),
-    transform 2.4s var(--ease);
+  transition: opacity 0.9s var(--ease);
   filter: brightness(0.5) saturate(0.85);
 }
 .services-bg img.is-shown {
   opacity: 1;
-  transform: scale(1);
 }
 .services-bg::after {
   content: "";
@@ -1074,9 +1070,6 @@ a:hover > .text-link .direction-icon {
   grid-template-columns: 90px minmax(0, 1fr);
   gap: 0 24px;
   padding-left: 0;
-}
-.service-body img {
-  display: none;
 }
 .service-body p {
   grid-column: 2;
@@ -2759,11 +2752,6 @@ a:hover > .text-link .direction-icon {
   }
   .service-body > div {
     grid-template-columns: 1fr;
-  }
-  .service-body img {
-    display: block;
-    aspect-ratio: 16 / 9;
-    margin-bottom: 22px;
   }
   .service-body p,
   .service-body .text-link {

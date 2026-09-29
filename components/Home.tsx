@@ -198,6 +198,7 @@ function Services({ onChoose }: { onChoose: (i: number | null) => void }) {
                 aria-expanded={open === i}
                 onFocus={() => setActive(i)}
                 onClick={() => {
+                  setActive(i);
                   setOpen(open === i ? null : i);
                   track("cta_click", s.title);
                 }}
@@ -209,7 +210,6 @@ function Services({ onChoose }: { onChoose: (i: number | null) => void }) {
               </button>
               <div className="service-body">
                 <div>
-                  <img src={photo(s.image)} alt="" loading="lazy" decoding="async" />
                   <p>{s.text}</p>
                   <a
                     className="text-link"

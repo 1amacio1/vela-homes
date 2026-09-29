@@ -23,7 +23,7 @@ export function ProjectRow({ project, index = 0 }: { project: Project; index?: n
       </div>
       <div className="row-copy">
         <span className="label">
-          {String(projects.indexOf(project) + 1).padStart(2, "0")} · {project.tag}
+          {project.tag} · {project.location}
         </span>
         <h3>{project.name}</h3>
         <p>{project.description}</p>
