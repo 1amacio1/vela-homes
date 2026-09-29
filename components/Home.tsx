@@ -1,6 +1,6 @@
 "use client";
 import { DirectionIcon } from "@/components/DirectionIcon";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Header, Footer, Analytics } from "./Chrome";
 import { Intro } from "./Intro";
@@ -21,8 +21,8 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <Directions onChoose={setService} />
         <Showcase />
-        <Services active={service} onSelect={setService} />
         <About />
         <Calculator
           value={calc}
@@ -50,104 +50,207 @@ export default function Home() {
   );
 }
 
+/* ---------- Первый экран ---------- */
 function Hero() {
-  const featured = projects[0];
-  const directions = [
-    { title: "Проекты домов", text: "12 реализованных историй", href: "/projects", image: pictures.strip[0], event: "Проекты" },
-    { title: "Строительство", text: "Тёплый контур, предчистовая, под ключ", href: "#services", image: pictures.strip[1], event: "Строительство" },
-    { title: "Интерьер и отделка", text: "Свой дизайнер или наш", href: "#services", image: pictures.strip[2], event: "Интерьер" },
-    { title: "Участок и ландшафт", text: "Террасы, газон, освещение", href: "#services", image: pictures.strip[3], event: "Ландшафт" },
-  ];
+  const featured = projects.find((p) => p.image === pictures.hero) ?? projects[0];
   return (
     <section className="hero" aria-label="VELA — строительство домов">
-      <div className="hero-stage">
-        <div className="hero-media">
-          <img
-            src={photo(pictures.hero)}
-            alt="Современный дом с панорамным остеклением в сумерках"
-            fetchPriority="high"
-            decoding="async"
-          />
-        </div>
-        <div className="hero-shade" />
-        <div className="hero-inner">
-          <div className="hero-copy">
-            <p className="hero-kicker" style={{ "--i": 0 } as React.CSSProperties}>
-              <span>VELA</span>
-              <i />
-              <span>Частные дома · с 2005 года</span>
-            </p>
-            <h1 style={{ "--i": 1 } as React.CSSProperties}>
-              Строительство домов
-              <br />
-              по всей России
-            </h1>
-            <p className="hero-sub" style={{ "--i": 2 } as React.CSSProperties}>
-              Проектируем, строим и отделываем частные дома под ключ.
-              Можно прийти с идеей, готовым проектом или своим архитектором —
-              возьмём на себя весь процесс или отдельный этап.
-            </p>
-            <div className="hero-actions" style={{ "--i": 3 } as React.CSSProperties}>
-              <a
-                className="button"
-                href="#calculator"
-                onClick={() => track("cta_click", "Рассчитать стоимость")}
-              >
-                Рассчитать стоимость
-              </a>
-              <a
-                className="button ghost"
-                href="#projects"
-                onClick={() => track("cta_click", "Смотреть проекты")}
-              >
-                Смотреть проекты <DirectionIcon />
-              </a>
-            </div>
-          </div>
-          <a
-            className="hero-featured"
-            href={"/projects/" + featured.slug}
-            onClick={() => track("project_view", featured.name)}
-          >
-            <span className="hero-featured-label">На фото</span>
-            <span className="hero-featured-name">
-              {featured.name}
-              <DirectionIcon size={16} />
-            </span>
-            <span className="hero-featured-meta">
-              {featured.area} м² · {featured.location}
-            </span>
-          </a>
-        </div>
+      <div className="hero-media">
+        <img
+          src={photo(pictures.hero)}
+          alt="Загородный дом с бассейном в сумерках"
+          fetchPriority="high"
+          decoding="async"
+        />
       </div>
-      <nav className="hero-strip" aria-label="Направления работы">
-        {directions.map((d, i) => (
-          <a
-            key={d.title}
-            href={d.href}
-            style={{ "--i": i } as React.CSSProperties}
-            onClick={() => track("cta_click", d.event)}
-          >
-            <img src={photo(d.image)} alt="" loading="lazy" decoding="async" />
-            <span>
-              <strong>{d.title}</strong>
-              <small>{d.text}</small>
-            </span>
+      <div className="hero-shade" />
+      <div className="hero-inner">
+        <div className="hero-copy">
+          <p className="hero-kicker" style={{ "--i": 0 } as React.CSSProperties}>
+            VELA <i /> с 2005 года
+          </p>
+          <h1 style={{ "--i": 1 } as React.CSSProperties}>
+            Строительство домов
+            <br />
+            по всей России
+          </h1>
+          <p className="hero-sub" style={{ "--i": 2 } as React.CSSProperties}>
+            Проект, стройка, интерьер и участок — одной командой.
+            Или только тот этап, который нужен вам.
+          </p>
+          <div className="hero-actions" style={{ "--i": 3 } as React.CSSProperties}>
+            <a
+              className="button"
+              href="#calculator"
+              onClick={() => track("cta_click", "Рассчитать стоимость")}
+            >
+              Рассчитать стоимость
+            </a>
+            <a
+              className="button ghost"
+              href="#projects"
+              onClick={() => track("cta_click", "Смотреть проекты")}
+            >
+              Смотреть проекты <DirectionIcon />
+            </a>
+          </div>
+        </div>
+        <a
+          className="hero-featured"
+          href={"/projects/" + featured.slug}
+          onClick={() => track("project_view", featured.name)}
+        >
+          <span className="hero-featured-label">На фото</span>
+          <span className="hero-featured-name">
+            Дом «{featured.name}»
             <DirectionIcon size={16} />
-          </a>
+          </span>
+          <span className="hero-featured-meta">
+            {featured.area} м² · {featured.location}
+          </span>
+        </a>
+      </div>
+      <ul className="hero-facts" aria-label="Коротко о компании">
+        {[
+          ["2005", "год основания"],
+          ["Вся Россия", "география строительства"],
+          ["Полный цикл", "от проекта до участка"],
+          ["Ваш или наш", "проект и архитектор"],
+        ].map(([v, l], i) => (
+          <li key={v} style={{ "--i": i } as React.CSSProperties}>
+            <strong>{v}</strong>
+            <span>{l}</span>
+          </li>
         ))}
-      </nav>
+      </ul>
     </section>
   );
 }
 
+/* ---------- Направления: горизонтальная лента крупных фото ---------- */
+function Directions({ onChoose }: { onChoose: (i: number | null) => void }) {
+  const row = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState<number | null>(null);
+  const [edge, setEdge] = useState({ start: true, end: false });
+  useEffect(() => {
+    const el = row.current;
+    if (!el) return;
+    const update = () =>
+      setEdge({
+        start: el.scrollLeft < 8,
+        end: el.scrollLeft + el.clientWidth > el.scrollWidth - 8,
+      });
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+  const scroll = (dir: number) => {
+    const el = row.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>(".dir-card");
+    el.scrollBy({ left: dir * ((card?.offsetWidth ?? 320) + 24), behavior: "smooth" });
+  };
+  return (
+    <section className="section directions" id="services">
+      <div className="section-head" data-reveal>
+        <div className="section-index">
+          <span>01</span>
+          <i />
+          <span>Услуги</span>
+        </div>
+        <h2>
+          Пять направлений.
+          <br />
+          <em>Одна команда.</em>
+        </h2>
+        <p className="lead">
+          Берём на себя весь путь от эскиза до ключей — или подключаемся на
+          нужном этапе. Полный комплекс или отдельные работы: выбираете вы.
+        </p>
+      </div>
+      <div className="dir-wrap">
+        <div className="dir-row" ref={row} data-reveal>
+          {offerings.map((s, i) => (
+            <article
+              key={s.title}
+              className={"dir-card" + (open === i ? " is-open" : "")}
+              onMouseEnter={() => setOpen(i)}
+              onMouseLeave={() => setOpen(null)}
+            >
+              <img src={photo(s.image)} alt={s.title} loading="lazy" decoding="async" />
+              <button
+                type="button"
+                className="dir-toggle"
+                aria-expanded={open === i}
+                onClick={() => {
+                  setOpen(open === i ? null : i);
+                  track("cta_click", s.title);
+                }}
+              >
+                <span className="dir-no">0{i + 1}</span>
+                <span className="dir-title">
+                  <h3>{s.title}</h3>
+                  <small>{s.sub}</small>
+                </span>
+                <span className="dir-plus" aria-hidden="true" />
+              </button>
+              <div className="dir-body">
+                <p>{s.text}</p>
+                <a
+                  className="text-link"
+                  href="#contact"
+                  onClick={() => {
+                    onChoose(i);
+                    track("cta_click", "Обсудить услуги");
+                  }}
+                >
+                  Обсудить <DirectionIcon />
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="dir-nav" data-reveal>
+          <p className="helper">
+            Клиент может заказать как полный комплекс, так и отдельные работы.
+          </p>
+          <div>
+            <button
+              type="button"
+              aria-label="Назад"
+              disabled={edge.start}
+              onClick={() => scroll(-1)}
+            >
+              <DirectionIcon direction="left" size={18} />
+            </button>
+            <button
+              type="button"
+              aria-label="Вперёд"
+              disabled={edge.end}
+              onClick={() => scroll(1)}
+            >
+              <DirectionIcon direction="right" size={18} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Проекты: один крупный и три карточки ---------- */
 function Showcase() {
-  const featured = projects.slice(0, 4);
+  const lead = projects[0];
+  const rest = [projects[1], projects[3], projects[4]];
   return (
     <section className="section showcase" id="projects">
       <div className="section-head" data-reveal>
         <div className="section-index">
-          <span>01</span>
+          <span>02</span>
           <i />
           <span>Проекты</span>
         </div>
@@ -157,19 +260,39 @@ function Showcase() {
           <em>Один подход к качеству.</em>
         </h2>
         <p className="lead">
-          У каждого дома — своя история и свой характер.
-          <br />
-          Следующая может стать вашей.
+          Газобетон, кирпич, керамика, дерево, каркас. Одноэтажные и семейные,
+          в лесу и у воды — у каждого дома свой характер.
         </p>
       </div>
+      <a
+        className="showcase-lead"
+        href={"/projects/" + lead.slug}
+        onClick={() => track("project_view", lead.name)}
+        data-reveal
+      >
+        <img
+          src={photo(lead.image)}
+          alt={"Дом «" + lead.name + "»"}
+          loading="lazy"
+          decoding="async"
+        />
+        <span className="showcase-lead-shade" />
+        <span className="showcase-lead-copy">
+          <span className="label">{lead.tag} · {lead.location}</span>
+          <strong>{lead.name}</strong>
+          <span className="showcase-lead-desc">{lead.description}</span>
+        </span>
+        <span className="showcase-lead-meta">
+          <b>{lead.area}</b>
+          <small>м² · {lead.floors} этажа · {lead.material}</small>
+          <span className="circle-arrow">
+            <DirectionIcon />
+          </span>
+        </span>
+      </a>
       <div className="showcase-grid">
-        {featured.map((p, i) => (
-          <ProjectCard
-            key={p.slug}
-            project={p}
-            index={i}
-            variant={i === 1 || i === 2 ? "tall" : "wide"}
-          />
+        {rest.map((p, i) => (
+          <ProjectCard key={p.slug} project={p} index={i} variant={i === 1 ? "tall" : "wide"} />
         ))}
       </div>
       <div className="showcase-more" data-reveal>
@@ -189,107 +312,16 @@ function Showcase() {
   );
 }
 
-function Services({
-  active,
-  onSelect,
-}: {
-  active: number | null;
-  onSelect: (i: number | null) => void;
-}) {
-  const [hover, setHover] = useState<number | null>(null);
-  const shown = hover ?? active ?? 0;
-  return (
-    <section className="section services" id="services">
-      <div className="section-head" data-reveal>
-        <div className="section-index">
-          <span>02</span>
-          <i />
-          <span>Услуги</span>
-        </div>
-        <h2>
-          От идеи
-          <br />
-          <em>до ощущения дома.</em>
-        </h2>
-        <p className="lead">
-          Пять направлений одной команды. Берём на себя весь процесс
-          или подключаемся на нужном этапе — полный комплекс или отдельные
-          работы.
-        </p>
-      </div>
-      <div className="services-layout">
-        <div className="services-stage" aria-hidden="true" data-reveal>
-          {offerings.map((s, i) => (
-            <img
-              key={s.title}
-              src={photo(s.image)}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              className={shown === i ? "is-shown" : ""}
-            />
-          ))}
-          <span className="services-stage-index">
-            0{shown + 1} <i>/ 05</i>
-          </span>
-          <span className="services-stage-title">{offerings[shown].sub}</span>
-        </div>
-        <ol className="services-list">
-          {offerings.map((s, i) => (
-            <li
-              key={s.title}
-              className={active === i ? "is-active" : ""}
-              data-reveal
-              style={{ "--i": i } as React.CSSProperties}
-            >
-              <button
-                type="button"
-                aria-expanded={active === i}
-                onMouseEnter={() => setHover(i)}
-                onMouseLeave={() => setHover(null)}
-                onFocus={() => setHover(i)}
-                onBlur={() => setHover(null)}
-                onClick={() => {
-                  onSelect(active === i ? null : i);
-                  track("cta_click", s.title);
-                }}
-              >
-                <span className="service-no">0{i + 1}</span>
-                <span className="service-name">
-                  <h3>{s.title}</h3>
-                  <small>{s.sub}</small>
-                </span>
-                <span className="service-plus" />
-              </button>
-              <div className="service-body">
-                <div>
-                  <img
-                    src={photo(s.image)}
-                    alt={s.title}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <p>{s.text}</p>
-                  <a
-                    className="text-link"
-                    href="#contact"
-                    onClick={() => track("cta_click", "Обсудить услуги")}
-                  >
-                    Обсудить задачу <DirectionIcon />
-                  </a>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
-  );
-}
-
+/* ---------- О компании: светлая секция ---------- */
 function About() {
+  const steps = [
+    ["Знакомство", "Слушаем, смотрим участок, обсуждаем бюджет и сроки. Можно прийти с идеей, готовым проектом или своим архитектором."],
+    ["Проект и смета", "Архитектура, инженерия, материалы. Смета и календарь работ — до начала стройки, без скрытых позиций."],
+    ["Строительство", "Свои бригады и технадзор на каждом этапе. Один ответственный человек на связи всё время."],
+    ["Отделка и участок", "Интерьер, инженерные системы, ландшафт, террасы, освещение. Передаём готовый дом и гарантию по договору."],
+  ];
   return (
-    <section className="section about" id="about">
+    <section className="section about light" id="about">
       <div className="about-grid">
         <div className="about-copy" data-reveal>
           <div className="section-index">
@@ -308,11 +340,11 @@ function About() {
             результат.
           </p>
           <p>
-            С 2005 года VELA занимается частными домами по всей России.
-            Проектируем, строим, создаём интерьеры и обустраиваем участки.
-            Работаем с газобетоном, кирпичом, керамическими блоками, деревом
-            и каркасными технологиями. Можно прийти с идеей, готовым проектом
-            или своим архитектором — либо доверить весь процесс нам.
+            С 2005 года VELA строит частные дома по всей России. Проектируем,
+            строим, создаём интерьеры и обустраиваем участки. Работаем с
+            газобетоном, кирпичом, керамическими блоками, деревом и каркасом.
+            Можно доверить нам весь процесс целиком или заказать отдельные
+            работы.
           </p>
           <dl className="about-facts">
             <div>
@@ -324,37 +356,23 @@ function About() {
               <dd>география строительства</dd>
             </div>
             <div>
-              <dt>Полный цикл</dt>
-              <dd>проект, стройка, интерьер, участок</dd>
+              <dt>Гарантия</dt>
+              <dd>сроки и обязательства в договоре</dd>
             </div>
           </dl>
         </div>
-        <div className="about-media" data-reveal>
-          <figure className="about-main">
-            <img
-              src={photo(pictures.aboutMain)}
-              alt="Дом с тёплым светом в окнах вечером"
-              loading="lazy"
-              decoding="async"
-            />
-            <figcaption>Продумано до последней детали</figcaption>
-          </figure>
-          <figure className="about-small">
-            <img
-              src={photo(pictures.aboutSmall)}
-              alt="Внутренний двор с водой и озеленением"
-              loading="lazy"
-              decoding="async"
-            />
-          </figure>
-        </div>
+        <figure className="about-photo" data-reveal>
+          <img
+            src={photo(pictures.about)}
+            alt="Светлый кирпичный дом в вечернем свете"
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption>Свет, материал, пропорции — продумано до детали</figcaption>
+        </figure>
       </div>
-      <ol className="approach">
-        {[
-          ["Смета и этапы — до начала работ", "Прозрачный бюджет и понятный календарь: вы знаете, что и когда происходит."],
-          ["Контроль качества и связь с командой", "Технадзор на каждом этапе и один ответственный человек на связи."],
-          ["Гарантийные обязательства — в договоре", "Фиксируем сроки, стоимость и гарантию письменно."],
-        ].map(([title, text], i) => (
+      <ol className="steps">
+        {steps.map(([title, text], i) => (
           <li key={title} data-reveal style={{ "--i": i } as React.CSSProperties}>
             <span>0{i + 1}</span>
             <h3>{title}</h3>
@@ -362,18 +380,11 @@ function About() {
           </li>
         ))}
       </ol>
-      <div className="photo-band" aria-label="Детали реализованных объектов">
-        {pictures.band.map((p, i) => (
-          <figure key={p.id} data-reveal style={{ "--i": i } as React.CSSProperties}>
-            <img src={photo(p.id)} alt={p.label} loading="lazy" decoding="async" />
-            <figcaption>{p.label}</figcaption>
-          </figure>
-        ))}
-      </div>
     </section>
   );
 }
 
+/* ---------- Отзывы ---------- */
 function Reviews() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -460,6 +471,7 @@ function Reviews() {
   );
 }
 
+/* ---------- Контакты и заявка ---------- */
 function Contact({
   attached,
   clearAttached,
