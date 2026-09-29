@@ -5,12 +5,11 @@ export default function Page() {
   return (
     <>
       <Header solid />
-      <main className="inner-page section legal">
-        <div className="section-index"><span>ДОКУМЕНТЫ</span><i /><span>23 СЕНТЯБРЯ 2026</span></div>
+      <main className="inner-page section legal" id="top">
+        <span className="sec-no">ДОКУМЕНТЫ · 23 СЕНТЯБРЯ 2026</span>
         <h1>
           Конфиденциальность
-          <br />
-          <em>и согласие.</em>
+                    и согласие.
         </h1>
         <p>
           VELA — демонстрационный сайт строительной компании. Для проверки

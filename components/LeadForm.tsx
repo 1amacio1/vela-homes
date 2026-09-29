@@ -154,7 +154,7 @@ export default function LeadForm({
         <h3>
           Ваша история
           <br />
-          <em>начинается здесь.</em>
+          начинается здесь.
         </h3>
         <p>Заявка сохранена. Мы изучим ваши пожелания и свяжемся с вами.</p>
         <small>Номер заявки: {success.slice(0, 8).toUpperCase()}</small>

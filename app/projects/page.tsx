@@ -7,38 +7,26 @@ export default function Page() {
   return (
     <>
       <Header solid />
-      <main className="inner-page">
+      <main className="inner-page" id="top">
         <section className="section page-head">
-          <div className="section-index" data-reveal>
-            <span>Портфолио</span>
-            <i />
-            <span>{projects.length} историй</span>
-          </div>
-          <div className="page-head-row" data-reveal>
-            <h1>
-              Найдите
-              <br />
-              <em>свой характер.</em>
-            </h1>
-            <p className="lead">
-              Современные дома, продуманные интерьеры и жизнь на открытом
-              воздухе. Разные материалы, регионы и площади — один подход к
-              качеству.
-            </p>
-          </div>
+          <header className="sec-head" data-reveal>
+            <span className="sec-no">Портфолио</span>
+            <div>
+              <h1>{projects.length} домов. Один подход к качеству.</h1>
+              <p className="lead">
+                Современные дома, продуманные интерьеры и жизнь на открытом воздухе. Разные
+                материалы, регионы и площади.
+              </p>
+            </div>
+          </header>
           <Catalog />
           <p className="demo-note">
-            Демонстрационный каталог. Названия, регионы и характеристики
-            придуманы. Фотографии — архитектурные референсы, не реальные
-            объекты VELA.
+            Демонстрационный каталог. Названия, регионы и характеристики придуманы. Фотографии —
+            архитектурные референсы, не реальные объекты VELA.
           </p>
         </section>
         <section className="section cta-band" data-reveal>
-          <h2>
-            Спроектируем дом
-            <br />
-            <em>под ваш образ жизни.</em>
-          </h2>
+          <h2>Спроектируем дом под ваш образ жизни</h2>
           <a className="button large" href="/#contact">
             Обсудить индивидуальный проект <DirectionIcon />
           </a>

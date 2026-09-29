@@ -1,19 +1,32 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Golos_Text } from "next/font/google";
-import { Reveal } from "@/components/Motion";
+import { Geologica, Onest, Playfair_Display, Golos_Text } from "next/font/google";
+import { Motion } from "@/components/Motion";
 import "./globals.css";
+import "./intro.css";
 
-const display = Playfair_Display({
+const display = Geologica({
   subsets: ["cyrillic", "latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal"],
+  weight: ["300", "400", "500"],
   variable: "--font-display",
   display: "swap",
 });
-const text = Golos_Text({
+const text = Onest({
   subsets: ["cyrillic", "latin"],
   weight: ["400", "500", "600"],
   variable: "--font-text",
+  display: "swap",
+});
+/* Шрифты заставки: заставка сохранена без изменений. */
+const intro = Playfair_Display({
+  subsets: ["cyrillic", "latin"],
+  weight: ["600"],
+  variable: "--font-intro",
+  display: "swap",
+});
+const introText = Golos_Text({
+  subsets: ["cyrillic", "latin"],
+  weight: ["600"],
+  variable: "--font-intro-text",
   display: "swap",
 });
 
@@ -24,7 +37,7 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.svg" },
 };
 export const viewport: Viewport = {
-  themeColor: "#0e0f0e",
+  themeColor: "#0f1012",
   width: "device-width",
   initialScale: 1,
 };
@@ -36,12 +49,12 @@ export default function RootLayout({
   return (
     <html
       lang="ru"
-      className={`${display.variable} ${text.variable}`}
+      className={`${display.variable} ${text.variable} ${intro.variable} ${introText.variable}`}
       suppressHydrationWarning
     >
       <body>
         {children}
-        <Reveal />
+        <Motion />
       </body>
     </html>
   );

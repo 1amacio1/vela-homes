@@ -4,16 +4,11 @@ export default function NotFound() {
   return (
     <>
       <Header solid />
-      <main className="inner-page section legal">
-        <div className="section-index">
-          <span>404</span>
-          <i />
-          <span>Страница не найдена</span>
-        </div>
+      <main className="inner-page section legal" id="top">
+        <span className="sec-no">404 · Страница не найдена</span>
         <h1>
           Здесь пока
-          <br />
-          <em>ничего не построено.</em>
+                    ничего не построено.
         </h1>
         <a className="button" href="/">
           На главную <DirectionIcon />

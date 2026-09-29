@@ -61,22 +61,16 @@ export default function Calculator({
   const pack = packages.find((p) => p.id === value.package)!;
   return (
     <section className="section calculator-section" id="calculator">
-      <div className="section-head" data-reveal>
-        <div className="section-index">
-          <span>04</span>
-          <i />
-          <span>Стоимость</span>
+      <header className="sec-head" data-reveal>
+        <span className="sec-no">04</span>
+        <div>
+          <h2>Начните с простого расчёта</h2>
+          <p className="lead">
+            Выберите параметры будущего дома — стоимость пересчитывается сразу. Мы поможем
+            уточнить детали и бюджет.
+          </p>
         </div>
-        <h2>
-          Начните
-          <br />
-          <em>с простого расчёта.</em>
-        </h2>
-        <p className="lead">
-          Выберите параметры будущего дома — стоимость пересчитывается сразу.
-          Мы поможем уточнить детали и бюджет.
-        </p>
-      </div>
+      </header>
       <div className="rates" data-reveal>
         {packages.map((p) => (
           <div key={p.id}>

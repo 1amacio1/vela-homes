@@ -17,7 +17,7 @@ export function Header({ solid = false }: { solid?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -40,7 +40,7 @@ export function Header({ solid = false }: { solid?: boolean }) {
         }
       >
         <div className="header-inner">
-          <Logo />
+          <Logo compact />
           <nav className="header-nav" aria-label="Основная навигация">
             {links.map(([href, title]) => (
               <a key={href} href={href}>
@@ -57,7 +57,7 @@ export function Header({ solid = false }: { solid?: boolean }) {
               +7 495 000-00-05
             </a>
             <a
-              className="button ghost"
+              className="header-cta"
               href="/#contact"
               onClick={() => track("cta_click", "Обсудить проект")}
             >
@@ -96,18 +96,10 @@ export function Header({ solid = false }: { solid?: boolean }) {
           ))}
         </nav>
         <div className="menu-foot">
-          <a
-            href="tel:+74950000005"
-            onClick={() => track("phone_click")}
-            tabIndex={open ? 0 : -1}
-          >
+          <a href="tel:+74950000005" onClick={() => track("phone_click")} tabIndex={open ? 0 : -1}>
             +7 (495) 000-00-05
           </a>
-          <a
-            href="mailto:hello@vela.example"
-            onClick={() => track("email_click")}
-            tabIndex={open ? 0 : -1}
-          >
+          <a href="mailto:hello@vela.example" onClick={() => track("email_click")} tabIndex={open ? 0 : -1}>
             hello@vela.example
           </a>
           <span>Москва, ул. Волхонка, 15</span>
@@ -120,17 +112,10 @@ export function Header({ solid = false }: { solid?: boolean }) {
 export function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-word" aria-hidden="true">
-        VELA
-      </div>
-      <div className="footer-grid">
+      <div className="footer-top">
         <div className="footer-brand">
           <Logo />
-          <p>
-            Строительство домов по всей России.
-            <br />
-            Проект, стройка, интерьер, участок.
-          </p>
+          <p>Строительство домов по всей России с 2005 года.</p>
         </div>
         <nav className="footer-nav" aria-label="Разделы сайта">
           {links.map(([href, title]) => (
@@ -143,10 +128,7 @@ export function Footer() {
           <a href="tel:+74950000005" onClick={() => track("phone_click")}>
             +7 (495) 000-00-05
           </a>
-          <a
-            href="mailto:hello@vela.example"
-            onClick={() => track("email_click")}
-          >
+          <a href="mailto:hello@vela.example" onClick={() => track("email_click")}>
             hello@vela.example
           </a>
           <span>Москва, ул. Волхонка, 15</span>
@@ -156,6 +138,9 @@ export function Footer() {
         <span>© VELA, 2005–{new Date().getFullYear()}</span>
         <a href="/privacy">Политика конфиденциальности</a>
         <a href="/credits">О демонстрационном проекте</a>
+        <a href="#top" className="footer-up" aria-label="Наверх">
+          Наверх <DirectionIcon direction="up" size={14} />
+        </a>
       </div>
     </footer>
   );
@@ -196,5 +181,3 @@ export function Analytics() {
     </aside>
   ) : null;
 }
-
-export { DirectionIcon };

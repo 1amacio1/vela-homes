@@ -1,10 +1,10 @@
 "use client";
 import { DirectionIcon } from "@/components/DirectionIcon";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Header, Footer, Analytics } from "./Chrome";
 import { Intro } from "./Intro";
-import { ProjectCard } from "./Projects";
+import { ProjectRow } from "./Projects";
 import Calculator from "./Calculator";
 import LeadForm from "./LeadForm";
 import { projects, photo, reviews, offerings, pictures } from "@/lib/content";
@@ -19,10 +19,10 @@ export default function Home() {
     <>
       <Intro />
       <Header />
-      <main>
+      <main id="top">
         <Hero />
-        <Directions onChoose={setService} />
-        <Showcase />
+        <Portfolio />
+        <Services onChoose={setService} />
         <About />
         <Calculator
           value={calc}
@@ -32,9 +32,7 @@ export default function Home() {
           }}
           onApply={() => {
             setAttached({ ...calc });
-            document
-              .getElementById("contact")
-              ?.scrollIntoView({ behavior: "smooth" });
+            document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
           }}
         />
         <Reviews />
@@ -50,326 +48,246 @@ export default function Home() {
   );
 }
 
-/* ---------- Первый экран ---------- */
+/* ---------- 01 · Первый экран: дом, вордмарк, две кнопки ---------- */
 function Hero() {
   const featured = projects.find((p) => p.image === pictures.hero) ?? projects[0];
   return (
     <section className="hero" aria-label="VELA — строительство домов">
-      <div className="hero-media">
+      <div className="hero-media" data-parallax="0.08">
         <img
           src={photo(pictures.hero)}
-          alt="Загородный дом с бассейном в сумерках"
+          alt="Современный дом с панорамным остеклением в сумерках"
           fetchPriority="high"
           decoding="async"
         />
       </div>
       <div className="hero-shade" />
-      <div className="hero-inner">
-        <div className="hero-copy">
-          <p className="hero-kicker" style={{ "--i": 0 } as React.CSSProperties}>
-            VELA <i /> с 2005 года
-          </p>
-          <h1 style={{ "--i": 1 } as React.CSSProperties}>
+      <div className="hero-top" data-hero-anim style={{ "--i": 0 } as React.CSSProperties}>
+        <span>Частные дома · с 2005 года</span>
+        <a href={"/projects/" + featured.slug} onClick={() => track("project_view", featured.name)}>
+          На фото — дом «{featured.name}», {featured.area} м² <DirectionIcon size={14} />
+        </a>
+      </div>
+      <div className="hero-bottom">
+        <div className="hero-row">
+          <h1 data-hero-anim style={{ "--i": 1 } as React.CSSProperties}>
             Строительство домов
             <br />
             по всей России
           </h1>
-          <p className="hero-sub" style={{ "--i": 2 } as React.CSSProperties}>
-            Проект, стройка, интерьер и участок — одной командой.
-            Или только тот этап, который нужен вам.
-          </p>
-          <div className="hero-actions" style={{ "--i": 3 } as React.CSSProperties}>
-            <a
-              className="button"
-              href="#calculator"
-              onClick={() => track("cta_click", "Рассчитать стоимость")}
-            >
+          <div className="hero-actions" data-hero-anim style={{ "--i": 2 } as React.CSSProperties}>
+            <a className="button" href="#calculator" onClick={() => track("cta_click", "Рассчитать стоимость")}>
               Рассчитать стоимость
             </a>
-            <a
-              className="button ghost"
-              href="#projects"
-              onClick={() => track("cta_click", "Смотреть проекты")}
-            >
-              Смотреть проекты <DirectionIcon />
+            <a className="button ghost" href="#projects" onClick={() => track("cta_click", "Смотреть проекты")}>
+              Смотреть проекты
             </a>
           </div>
         </div>
-        <a
-          className="hero-featured"
-          href={"/projects/" + featured.slug}
-          onClick={() => track("project_view", featured.name)}
-        >
-          <span className="hero-featured-label">На фото</span>
-          <span className="hero-featured-name">
-            Дом «{featured.name}»
-            <DirectionIcon size={16} />
-          </span>
-          <span className="hero-featured-meta">
-            {featured.area} м² · {featured.location}
-          </span>
-        </a>
+        <div className="hero-word" aria-hidden="true" data-hero-anim style={{ "--i": 3 } as React.CSSProperties}>
+          {["V", "E", "L", "A"].map((c, i) => (
+            <span key={c} style={{ "--i": i } as React.CSSProperties}>
+              {c}
+            </span>
+          ))}
+        </div>
       </div>
-      <ul className="hero-facts" aria-label="Коротко о компании">
-        {[
-          ["2005", "год основания"],
-          ["Вся Россия", "география строительства"],
-          ["Полный цикл", "от проекта до участка"],
-          ["Ваш или наш", "проект и архитектор"],
-        ].map(([v, l], i) => (
-          <li key={v} style={{ "--i": i } as React.CSSProperties}>
-            <strong>{v}</strong>
-            <span>{l}</span>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }
 
-/* ---------- Направления: горизонтальная лента крупных фото ---------- */
-function Directions({ onChoose }: { onChoose: (i: number | null) => void }) {
-  const row = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState<number | null>(null);
-  const [edge, setEdge] = useState({ start: true, end: false });
-  useEffect(() => {
-    const el = row.current;
-    if (!el) return;
-    const update = () =>
-      setEdge({
-        start: el.scrollLeft < 8,
-        end: el.scrollLeft + el.clientWidth > el.scrollWidth - 8,
-      });
-    update();
-    el.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      el.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, []);
-  const scroll = (dir: number) => {
-    const el = row.current;
-    if (!el) return;
-    const card = el.querySelector<HTMLElement>(".dir-card");
-    el.scrollBy({ left: dir * ((card?.offsetWidth ?? 320) + 24), behavior: "smooth" });
-  };
+/* ---------- 02 · Проекты: архитектурное портфолио ---------- */
+function Portfolio() {
+  const lead = projects[0];
+  const rows = [projects[1], projects[3], projects[4]];
   return (
-    <section className="section directions" id="services">
-      <div className="section-head" data-reveal>
-        <div className="section-index">
-          <span>01</span>
-          <i />
-          <span>Услуги</span>
+    <section className="section portfolio" id="projects">
+      <header className="sec-head" data-reveal>
+        <span className="sec-no">01</span>
+        <div>
+          <h2>Разные дома. Один подход к качеству.</h2>
+          <p className="lead">
+            Газобетон, кирпич, керамика, дерево, каркас. Одноэтажные и семейные, в лесу и у воды —
+            у каждого дома свой характер.
+          </p>
         </div>
-        <h2>
-          Пять направлений.
-          <br />
-          <em>Одна команда.</em>
-        </h2>
-        <p className="lead">
-          Берём на себя весь путь от эскиза до ключей — или подключаемся на
-          нужном этапе. Полный комплекс или отдельные работы: выбираете вы.
+        <a className="text-link" href="/projects" onClick={() => track("cta_click", "Все проекты")}>
+          Все 12 проектов <DirectionIcon />
+        </a>
+      </header>
+      <a
+        className="feature"
+        href={"/projects/" + lead.slug}
+        onClick={() => track("project_view", lead.name)}
+        data-reveal
+      >
+        <div className="feature-media" data-parallax="0.06">
+          <img src={photo(lead.image)} alt={"Дом «" + lead.name + "»"} loading="lazy" decoding="async" />
+        </div>
+        <div className="feature-copy">
+          <span className="label">{lead.tag} · {lead.location}</span>
+          <strong>{lead.name}</strong>
+          <span className="feature-desc">{lead.description}</span>
+        </div>
+        <div className="feature-meta">
+          <span>
+            <b>{lead.area}</b> м²
+          </span>
+          <span>
+            <b>{lead.floors}</b> этажа
+          </span>
+          <span>{lead.material}</span>
+        </div>
+      </a>
+      <div className="rows">
+        {rows.map((p, i) => (
+          <ProjectRow key={p.slug} project={p} index={i} />
+        ))}
+      </div>
+      <div className="portfolio-foot" data-reveal>
+        <a className="button ghost large" href="/projects" onClick={() => track("cta_click", "Все проекты")}>
+          Смотреть все проекты <DirectionIcon />
+        </a>
+        <p className="demo-note">
+          Демонстрационное портфолио: проекты и характеристики вымышлены, фотографии показывают
+          архитектурные референсы.
         </p>
       </div>
-      <div className="dir-wrap">
-        <div className="dir-row" ref={row} data-reveal>
+    </section>
+  );
+}
+
+/* ---------- 03 · Услуги: список поверх меняющегося фото ---------- */
+function Services({ onChoose }: { onChoose: (i: number | null) => void }) {
+  const [active, setActive] = useState(0);
+  const [open, setOpen] = useState<number | null>(null);
+  const shown = open ?? active;
+  return (
+    <section className="services" id="services">
+      <div className="services-bg" aria-hidden="true">
+        {offerings.map((s, i) => (
+          <img
+            key={s.title}
+            src={photo(s.image)}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className={shown === i ? "is-shown" : ""}
+          />
+        ))}
+      </div>
+      <div className="section services-inner">
+        <header className="sec-head" data-reveal>
+          <span className="sec-no">02</span>
+          <div>
+            <h2>Пять направлений одной команды</h2>
+            <p className="lead">
+              Полный комплекс или отдельные работы — выбираете вы. Берём весь путь от эскиза до
+              ключей или подключаемся на нужном этапе.
+            </p>
+          </div>
+        </header>
+        <ol className="service-list">
           {offerings.map((s, i) => (
-            <article
+            <li
               key={s.title}
-              className={"dir-card" + (open === i ? " is-open" : "")}
-              onMouseEnter={() => setOpen(i)}
-              onMouseLeave={() => setOpen(null)}
+              className={open === i ? "is-open" : ""}
+              data-reveal
+              style={{ "--i": i } as React.CSSProperties}
+              onMouseEnter={() => setActive(i)}
             >
-              <img src={photo(s.image)} alt={s.title} loading="lazy" decoding="async" />
               <button
                 type="button"
-                className="dir-toggle"
                 aria-expanded={open === i}
+                onFocus={() => setActive(i)}
                 onClick={() => {
                   setOpen(open === i ? null : i);
                   track("cta_click", s.title);
                 }}
               >
-                <span className="dir-no">0{i + 1}</span>
-                <span className="dir-title">
-                  <h3>{s.title}</h3>
-                  <small>{s.sub}</small>
-                </span>
-                <span className="dir-plus" aria-hidden="true" />
+                <span className="service-no">0{i + 1}</span>
+                <span className="service-title">{s.title}</span>
+                <span className="service-sub">{s.sub}</span>
+                <span className="service-plus" aria-hidden="true" />
               </button>
-              <div className="dir-body">
-                <p>{s.text}</p>
-                <a
-                  className="text-link"
-                  href="#contact"
-                  onClick={() => {
-                    onChoose(i);
-                    track("cta_click", "Обсудить услуги");
-                  }}
-                >
-                  Обсудить <DirectionIcon />
-                </a>
+              <div className="service-body">
+                <div>
+                  <img src={photo(s.image)} alt="" loading="lazy" decoding="async" />
+                  <p>{s.text}</p>
+                  <a
+                    className="text-link"
+                    href="#contact"
+                    onClick={() => {
+                      onChoose(i);
+                      track("cta_click", "Обсудить услуги");
+                    }}
+                  >
+                    Обсудить задачу <DirectionIcon />
+                  </a>
+                </div>
               </div>
-            </article>
+            </li>
           ))}
-        </div>
-        <div className="dir-nav" data-reveal>
-          <p className="helper">
-            Клиент может заказать как полный комплекс, так и отдельные работы.
-          </p>
-          <div>
-            <button
-              type="button"
-              aria-label="Назад"
-              disabled={edge.start}
-              onClick={() => scroll(-1)}
-            >
-              <DirectionIcon direction="left" size={18} />
-            </button>
-            <button
-              type="button"
-              aria-label="Вперёд"
-              disabled={edge.end}
-              onClick={() => scroll(1)}
-            >
-              <DirectionIcon direction="right" size={18} />
-            </button>
-          </div>
-        </div>
+        </ol>
       </div>
     </section>
   );
 }
 
-/* ---------- Проекты: один крупный и три карточки ---------- */
-function Showcase() {
-  const lead = projects[0];
-  const rest = [projects[1], projects[3], projects[4]];
-  return (
-    <section className="section showcase" id="projects">
-      <div className="section-head" data-reveal>
-        <div className="section-index">
-          <span>02</span>
-          <i />
-          <span>Проекты</span>
-        </div>
-        <h2>
-          Разные дома.
-          <br />
-          <em>Один подход к качеству.</em>
-        </h2>
-        <p className="lead">
-          Газобетон, кирпич, керамика, дерево, каркас. Одноэтажные и семейные,
-          в лесу и у воды — у каждого дома свой характер.
-        </p>
-      </div>
-      <a
-        className="showcase-lead"
-        href={"/projects/" + lead.slug}
-        onClick={() => track("project_view", lead.name)}
-        data-reveal
-      >
-        <img
-          src={photo(lead.image)}
-          alt={"Дом «" + lead.name + "»"}
-          loading="lazy"
-          decoding="async"
-        />
-        <span className="showcase-lead-shade" />
-        <span className="showcase-lead-copy">
-          <span className="label">{lead.tag} · {lead.location}</span>
-          <strong>{lead.name}</strong>
-          <span className="showcase-lead-desc">{lead.description}</span>
-        </span>
-        <span className="showcase-lead-meta">
-          <b>{lead.area}</b>
-          <small>м² · {lead.floors} этажа · {lead.material}</small>
-          <span className="circle-arrow">
-            <DirectionIcon />
-          </span>
-        </span>
-      </a>
-      <div className="showcase-grid">
-        {rest.map((p, i) => (
-          <ProjectCard key={p.slug} project={p} index={i} variant={i === 1 ? "tall" : "wide"} />
-        ))}
-      </div>
-      <div className="showcase-more" data-reveal>
-        <a
-          className="button ghost large"
-          href="/projects"
-          onClick={() => track("cta_click", "Все проекты")}
-        >
-          Все 12 проектов <DirectionIcon />
-        </a>
-        <p className="demo-note">
-          Демонстрационное портфолио: проекты и характеристики вымышлены,
-          фотографии показывают архитектурные референсы.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- О компании: светлая секция ---------- */
+/* ---------- 04 · О компании: заявление, факты, фотополоса, этапы ---------- */
 function About() {
   const steps = [
     ["Знакомство", "Слушаем, смотрим участок, обсуждаем бюджет и сроки. Можно прийти с идеей, готовым проектом или своим архитектором."],
-    ["Проект и смета", "Архитектура, инженерия, материалы. Смета и календарь работ — до начала стройки, без скрытых позиций."],
+    ["Проект и смета", "Архитектура, инженерия, материалы. Смета и календарь работ фиксируются до начала стройки."],
     ["Строительство", "Свои бригады и технадзор на каждом этапе. Один ответственный человек на связи всё время."],
     ["Отделка и участок", "Интерьер, инженерные системы, ландшафт, террасы, освещение. Передаём готовый дом и гарантию по договору."],
   ];
   return (
-    <section className="section about light" id="about">
+    <section className="section about" id="about">
+      <header className="sec-head" data-reveal>
+        <span className="sec-no">03</span>
+        <div>
+          <h2>Строим так, как строили бы для себя</h2>
+        </div>
+      </header>
       <div className="about-grid">
-        <div className="about-copy" data-reveal>
-          <div className="section-index">
-            <span>03</span>
-            <i />
-            <span>О компании</span>
-          </div>
-          <h2>
-            Строим так,
-            <br />
-            как строили бы <em>для себя.</em>
-          </h2>
-          <p className="lead">
-            Дом — это большое решение. Мы делаем путь к нему понятным:
-            слушаем, обсуждаем варианты и объясняем, из чего складывается
-            результат.
+        <p className="statement" data-reveal>
+          Дом — это большое решение. Мы делаем путь к нему понятным: слушаем, обсуждаем варианты
+          и объясняем, из чего складывается результат.
+        </p>
+        <div className="about-text" data-reveal>
+          <p>
+            С 2005 года VELA строит частные дома по всей России. Проектируем, строим, создаём
+            интерьеры и обустраиваем участки. Работаем с газобетоном, кирпичом, керамическими
+            блоками, деревом и каркасными технологиями.
           </p>
           <p>
-            С 2005 года VELA строит частные дома по всей России. Проектируем,
-            строим, создаём интерьеры и обустраиваем участки. Работаем с
-            газобетоном, кирпичом, керамическими блоками, деревом и каркасом.
-            Можно доверить нам весь процесс целиком или заказать отдельные
-            работы.
+            Можно прийти со своим архитектором, дизайнером или готовым проектом — либо доверить
+            весь процесс нам. Сроки, стоимость и гарантийные обязательства фиксируем в договоре.
           </p>
-          <dl className="about-facts">
-            <div>
-              <dt>2005</dt>
-              <dd>год начала нашей истории</dd>
-            </div>
-            <div>
-              <dt>Вся Россия</dt>
-              <dd>география строительства</dd>
-            </div>
-            <div>
-              <dt>Гарантия</dt>
-              <dd>сроки и обязательства в договоре</dd>
-            </div>
-          </dl>
         </div>
-        <figure className="about-photo" data-reveal>
-          <img
-            src={photo(pictures.about)}
-            alt="Светлый кирпичный дом в вечернем свете"
-            loading="lazy"
-            decoding="async"
-          />
-          <figcaption>Свет, материал, пропорции — продумано до детали</figcaption>
-        </figure>
+      </div>
+      <dl className="facts" data-reveal>
+        <div>
+          <dt>2005</dt>
+          <dd>год начала истории</dd>
+        </div>
+        <div>
+          <dt>Вся Россия</dt>
+          <dd>география строительства</dd>
+        </div>
+        <div>
+          <dt>Полный цикл</dt>
+          <dd>проект, стройка, интерьер, участок</dd>
+        </div>
+        <div>
+          <dt>5</dt>
+          <dd>технологий строительства</dd>
+        </div>
+      </dl>
+      <div className="band" data-parallax="0.1" data-reveal>
+        <img src={photo(pictures.band)} alt="Терраса дома вечером" loading="lazy" decoding="async" />
+        <span>Продумано до последней детали</span>
       </div>
       <ol className="steps">
         {steps.map(([title, text], i) => (
@@ -384,7 +302,7 @@ function About() {
   );
 }
 
-/* ---------- Отзывы ---------- */
+/* ---------- 06 · Отзывы ---------- */
 function Reviews() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -402,68 +320,35 @@ function Reviews() {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="section-head" data-reveal>
-        <div className="section-index">
-          <span>05</span>
-          <i />
-          <span>Отзывы</span>
+      <header className="sec-head" data-reveal>
+        <span className="sec-no">05</span>
+        <div>
+          <h2>Главное — что остаётся после</h2>
         </div>
-        <h2>
-          Главное —<br />
-          <em>что остаётся после.</em>
-        </h2>
-      </div>
-      <div className="reviews-layout">
-        <a
-          className="review-photo"
-          href={"/projects/" + r.slug}
-          aria-label={"Проект «" + r.project + "»"}
-          data-reveal
-        >
+      </header>
+      <div className="review-grid">
+        <blockquote className="review" key={index} aria-live="polite" data-reveal>
+          <p>{r.text}</p>
+          <footer>
+            <strong>{r.name}</strong>
+            <a href={"/projects/" + r.slug}>
+              Дом «{r.project}» <DirectionIcon size={14} />
+            </a>
+          </footer>
+        </blockquote>
+        <a className="review-photo" href={"/projects/" + r.slug} aria-label={"Проект «" + r.project + "»"} data-reveal>
           <img key={r.slug} src={photo(project.image)} alt="" loading="lazy" decoding="async" />
-          <span>
-            Дом «{r.project}» · {project.area} м²
-          </span>
         </a>
-        <div className="review" aria-live="polite" data-reveal>
-          <blockquote key={index}>
-            <p>{r.text}</p>
-            <footer>
-              <strong>{r.name}</strong>
-              <a href={"/projects/" + r.slug}>
-                Дом «{r.project}» <DirectionIcon size={14} />
-              </a>
-            </footer>
-          </blockquote>
-          <div className="review-controls">
-            <button
-              aria-label="Предыдущий отзыв"
-              onClick={() => setIndex((index + reviews.length - 1) % reviews.length)}
-            >
-              <DirectionIcon direction="left" size={18} />
-            </button>
-            <span className="review-count">
-              0{index + 1} <i>/ 0{reviews.length}</i>
-            </span>
-            <button
-              aria-label="Следующий отзыв"
-              onClick={() => setIndex((index + 1) % reviews.length)}
-            >
-              <DirectionIcon direction="right" size={18} />
-            </button>
-            <div className="review-dots" role="tablist" aria-label="Отзывы">
-              {reviews.map((x, i) => (
-                <button
-                  key={x.name}
-                  role="tab"
-                  aria-selected={i === index}
-                  aria-label={"Отзыв " + (i + 1)}
-                  className={i === index ? "is-active" : ""}
-                  onClick={() => setIndex(i)}
-                />
-              ))}
-            </div>
-          </div>
+        <div className="review-nav" data-reveal>
+          <button aria-label="Предыдущий отзыв" onClick={() => setIndex((index + reviews.length - 1) % reviews.length)}>
+            <DirectionIcon direction="left" size={18} />
+          </button>
+          <span>
+            {String(index + 1).padStart(2, "0")} <i>/ {String(reviews.length).padStart(2, "0")}</i>
+          </span>
+          <button aria-label="Следующий отзыв" onClick={() => setIndex((index + 1) % reviews.length)}>
+            <DirectionIcon direction="right" size={18} />
+          </button>
           <p className="demo-note">Демонстрационные отзывы.</p>
         </div>
       </div>
@@ -471,7 +356,7 @@ function Reviews() {
   );
 }
 
-/* ---------- Контакты и заявка ---------- */
+/* ---------- 07 · Контакты и заявка ---------- */
 function Contact({
   attached,
   clearAttached,
@@ -483,46 +368,26 @@ function Contact({
 }) {
   return (
     <section className="section contact" id="contact">
-      <div className="section-head" data-reveal>
-        <div className="section-index">
-          <span>06</span>
-          <i />
-          <span>Контакты</span>
+      <header className="sec-head" data-reveal>
+        <span className="sec-no">06</span>
+        <div>
+          <h2>Расскажите о вашем доме</h2>
+          <p className="lead">Даже если пока есть только идея. Поможем сделать следующий шаг.</p>
         </div>
-        <h2>
-          Расскажите
-          <br />
-          <em>о вашем доме.</em>
-        </h2>
-        <p className="lead">
-          Даже если пока есть только идея. Поможем сделать следующий шаг.
-        </p>
-      </div>
+      </header>
       <div className="contact-grid">
         <div className="contact-side" data-reveal>
-          <a
-            className="contact-phone"
-            href="tel:+74950000005"
-            onClick={() => track("phone_click")}
-          >
+          <a className="contact-phone" href="tel:+74950000005" onClick={() => track("phone_click")}>
             +7 (495) 000-00-05
           </a>
-          <a
-            className="contact-email"
-            href="mailto:hello@vela.example"
-            onClick={() => track("email_click")}
-          >
+          <a className="contact-email" href="mailto:hello@vela.example" onClick={() => track("email_click")}>
             hello@vela.example <DirectionIcon />
           </a>
           <p className="helper">Телефон и email — демонстрационные.</p>
           <div className="address">
             <span className="label">Офис</span>
             <p>Москва, ул. Волхонка, 15</p>
-            <a
-              href="https://yandex.ru/maps/?text=Москва%2C%20Волхонка%2C%2015"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href="https://yandex.ru/maps/?text=Москва%2C%20Волхонка%2C%2015" target="_blank" rel="noreferrer">
               Открыть маршрут <DirectionIcon size={14} />
             </a>
           </div>
@@ -536,11 +401,7 @@ function Contact({
           </div>
         </div>
         <div className="contact-form" data-reveal>
-          <LeadForm
-            calculation={attached}
-            clearCalculation={clearAttached}
-            initialService={service}
-          />
+          <LeadForm calculation={attached} clearCalculation={clearAttached} initialService={service} />
         </div>
       </div>
     </section>

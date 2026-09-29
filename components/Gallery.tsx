@@ -4,15 +4,10 @@ import { useRef, useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { photo } from "@/lib/content";
 
-export default function Gallery({
-  images,
-}: {
-  images: { id: number; label: string }[];
-}) {
+export default function Gallery({ images }: { images: { id: number; label: string }[] }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [active, setActive] = useState(0);
-  const next = (delta: number) =>
-    setActive((i) => (i + delta + images.length) % images.length);
+  const next = (delta: number) => setActive((i) => (i + delta + images.length) % images.length);
   useEffect(() => {
     function key(e: KeyboardEvent) {
       if (!dialog.current?.open) return;
@@ -26,27 +21,22 @@ export default function Gallery({
     <>
       <div className="gallery-grid">
         {images.map((im, i) => (
-          <button
-            key={i}
-            type="button"
-            className={"gallery-item g" + (i % 6)}
-            data-reveal
-            style={{ "--i": i % 3 } as React.CSSProperties}
-            onClick={() => {
-              setActive(i);
-              dialog.current?.showModal();
-            }}
-            aria-label={im.label + " — увеличить"}
-          >
-            <img src={photo(im.id)} alt={im.label} loading="lazy" decoding="async" />
-            <span className="gallery-caption">
-              <b>0{i + 1}</b>
+          <figure key={i} className={"gallery-item g" + (i % 6)} data-reveal>
+            <button
+              type="button"
+              onClick={() => {
+                setActive(i);
+                dialog.current?.showModal();
+              }}
+              aria-label={im.label + " — увеличить"}
+            >
+              <img src={photo(im.id)} alt={im.label} loading="lazy" decoding="async" />
+            </button>
+            <figcaption>
+              <span>{String(i + 1).padStart(2, "0")}</span>
               {im.label}
-            </span>
-            <span className="gallery-zoom">
-              <DirectionIcon />
-            </span>
-          </button>
+            </figcaption>
+          </figure>
         ))}
       </div>
       <dialog
@@ -56,18 +46,10 @@ export default function Gallery({
           if (e.target === e.currentTarget) dialog.current?.close();
         }}
       >
-        <button
-          className="lightbox-close"
-          aria-label="Закрыть галерею"
-          onClick={() => dialog.current?.close()}
-        >
+        <button className="lightbox-close" aria-label="Закрыть галерею" onClick={() => dialog.current?.close()}>
           <X size={20} strokeWidth={1.5} />
         </button>
-        <img
-          key={active}
-          src={photo(images[active].id)}
-          alt={images[active].label}
-        />
+        <img key={active} src={photo(images[active].id)} alt={images[active].label} />
         <div className="lightbox-bar">
           <button aria-label="Предыдущее фото" onClick={() => next(-1)}>
             <DirectionIcon direction="left" />

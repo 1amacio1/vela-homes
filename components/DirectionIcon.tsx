@@ -1,10 +1,11 @@
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight } from "lucide-react";
 
 const icons = {
   "up-right": ArrowUpRight,
   left: ArrowLeft,
   right: ArrowRight,
   down: ArrowDown,
+  up: ArrowUp,
 };
 
 /** Decorative directions use SVG, never platform-dependent emoji glyphs. */

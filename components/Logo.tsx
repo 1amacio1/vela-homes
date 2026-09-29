@@ -42,7 +42,7 @@ export function Logo({
       <Mark />
       <span className="logo-word">
         VELA
-        {!compact && <small>Архитектура жизни · с 2005</small>}
+        {!compact && <small>Строительство домов · с 2005</small>}
       </span>
     </a>
   );
