@@ -2635,6 +2635,58 @@ a:hover > .text-link .direction-icon {
   margin-top: 24px;
 }
 
+/* ---------- Передача вордмарка в шапку ---------- */
+.hero-word {
+  will-change: transform, opacity;
+}
+.header.hero-brand .logo {
+  transition:
+    opacity 0.5s var(--ease),
+    transform 0.5s var(--ease);
+}
+html[data-brand="off"] .header.hero-brand .logo {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+html.menu-open .header .logo {
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
+/* ---------- Переходы между страницами ---------- */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
+  animation-timing-function: var(--ease);
+}
+.cover-media img {
+  view-transition-name: project-cover;
+}
+::view-transition-group(project-cover) {
+  animation-duration: 0.7s;
+  animation-timing-function: var(--ease);
+}
+::view-transition-old(project-cover),
+::view-transition-new(project-cover) {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  overflow: hidden;
+  mix-blend-mode: normal;
+}
+::view-transition-old(project-cover) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(project-cover) {
+  animation: none;
+}
+
 /* ---------- Появление при прокрутке ---------- */
 [data-reveal] {
   opacity: 0;
@@ -3063,6 +3115,14 @@ a:hover > .text-link .direction-icon {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+  html[data-brand="off"] .header.hero-brand .logo {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
   html {
     scroll-behavior: auto;
   }

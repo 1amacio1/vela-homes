@@ -32,6 +32,35 @@ export function Motion() {
     const mo = new MutationObserver(watch);
     mo.observe(document.body, { childList: true, subtree: true });
 
+    /* Передача вордмарка в шапку: слово VELA уменьшается и гаснет,
+       логотип в шапке появляется, когда слово почти скрылось. */
+    const word = document.querySelector<HTMLElement>("[data-handoff]");
+    let wordEnd = 0;
+    const measure = () => {
+      if (!word) return;
+      const r = word.getBoundingClientRect();
+      wordEnd = r.top + window.scrollY + r.height * 0.9;
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    const handoff = () => {
+      if (!word) return;
+      const y = window.scrollY;
+      if (y <= 0) {
+        word.style.transform = "";
+        word.style.opacity = "";
+        document.documentElement.dataset.brand = "off";
+        return;
+      }
+      const end = Math.max(1, wordEnd);
+      const p = Math.min(1, Math.max(0, y / end));
+      word.style.transformOrigin = "left bottom";
+      word.style.transform = `translateY(${(-p * 40).toFixed(1)}px) scale(${(1 - 0.25 * p).toFixed(3)})`;
+      word.style.opacity = String(Math.max(0, 1 - p * 1.2).toFixed(3));
+      document.documentElement.dataset.brand = p > 0.85 ? "on" : "off";
+    };
+    if (word) document.documentElement.dataset.brand = "off";
+
     /* Параллакс */
     let items: { el: HTMLElement; img: HTMLElement; speed: number }[] = [];
     const collect = () => {
@@ -48,6 +77,7 @@ export function Motion() {
     let ticking = false;
     const frame = () => {
       ticking = false;
+      handoff();
       const vh = window.innerHeight;
       /* Страховка для reveal: всё, что уже в кадре, показываем. */
       for (const el of revealAll()) {
@@ -82,6 +112,64 @@ export function Motion() {
       mo2.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", measure);
+      delete document.documentElement.dataset.brand;
+    };
+  }, []);
+  useEffect(() => {
+    /* Перелёт фото проекта между страницами (cross-document View Transitions).
+       Имя project-cover должно быть ровно у одного элемента на странице. */
+    if (
+      !("startViewTransition" in document) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    const NAME = "project-cover";
+    let named: HTMLElement | null = null;
+    const clear = () => {
+      if (named) named.style.viewTransitionName = "";
+      named = null;
+    };
+    const name = (img: HTMLElement | null) => {
+      clear();
+      if (!img) return;
+      const cover = document.querySelector<HTMLElement>(".cover-media img");
+      if (cover && cover !== img) cover.style.viewTransitionName = "none";
+      img.style.viewTransitionName = NAME;
+      named = img;
+    };
+    const onDown = (e: Event) => {
+      const link = (e.target as HTMLElement).closest<HTMLAnchorElement>(
+        'a[href^="/projects/"]',
+      );
+      if (!link) return;
+      const img = link.querySelector<HTMLElement>("img");
+      name(img);
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    document.addEventListener("focusin", onDown, true);
+    type RevealEvent = Event & { viewTransition?: { finished: Promise<void> } };
+    const onReveal = (e: RevealEvent) => {
+      const nav = (window as unknown as { navigation?: { activation?: { from?: { url: string } } } }).navigation;
+      const from = nav?.activation?.from?.url;
+      if (!from || !e.viewTransition) return;
+      const m = new URL(from).pathname.match(/^\/projects\/([^/]+)\/?$/);
+      if (!m || document.querySelector(".cover-media img")) return;
+      const link = document.querySelector<HTMLAnchorElement>(
+        `a[href="/projects/${m[1]}"]`,
+      );
+      const img = link?.querySelector<HTMLElement>("img") ?? null;
+      if (!img) return;
+      link!.dataset.in = "1";
+      name(img);
+      e.viewTransition.finished.finally(clear);
+    };
+    window.addEventListener("pagereveal", onReveal as EventListener);
+    return () => {
+      document.removeEventListener("pointerdown", onDown, true);
+      document.removeEventListener("focusin", onDown, true);
+      window.removeEventListener("pagereveal", onReveal as EventListener);
+      clear();
     };
   }, []);
   return null;

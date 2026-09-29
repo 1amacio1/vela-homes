@@ -18,7 +18,7 @@ export default function Home() {
   return (
     <>
       <Intro />
-      <Header />
+      <Header brandFromHero />
       <main id="top">
         <Hero />
         <Portfolio />
@@ -84,7 +84,7 @@ function Hero() {
             </a>
           </div>
         </div>
-        <div className="hero-word" aria-hidden="true" data-hero-anim style={{ "--i": 3 } as React.CSSProperties}>
+        <div className="hero-word" aria-hidden="true" data-handoff>
           {["V", "E", "L", "A"].map((c, i) => (
             <span key={c} style={{ "--i": i } as React.CSSProperties}>
               {c}

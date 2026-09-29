@@ -154,6 +154,7 @@ html.intro-skip .intro {
 }
 /* Пока идёт заставка, анимации первого экрана ждут. */
 html.intro:not(.intro-done) .hero [data-hero-anim],
+html.intro:not(.intro-done) .hero-word span,
 html.intro:not(.intro-done) .hero img {
   animation-play-state: paused;
 }

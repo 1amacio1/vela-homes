@@ -13,7 +13,13 @@ const links = [
   ["/#contact", "Контакты"],
 ] as const;
 
-export function Header({ solid = false }: { solid?: boolean }) {
+export function Header({
+  solid = false,
+  brandFromHero = false,
+}: {
+  solid?: boolean;
+  brandFromHero?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -35,6 +41,7 @@ export function Header({ solid = false }: { solid?: boolean }) {
         className={
           "header" +
           (solid ? " solid" : "") +
+          (brandFromHero ? " hero-brand" : "") +
           (scrolled ? " scrolled" : "") +
           (open ? " open" : "")
         }
