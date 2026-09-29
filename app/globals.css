@@ -2841,6 +2841,7 @@ html.intro-skip .intro {
   letter-spacing: 0.3em;
   padding-left: 0.3em;
   position: relative;
+  clip-path: inset(-20% 0);
 }
 .intro-word span {
   display: inline-block;
