@@ -230,7 +230,6 @@ export default function LeadForm({
             name="phone"
             required
             minLength={18}
-            maxLength={18}
             pattern="\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}"
             title="Введите номер в формате +7 (999) 123-45-67"
           />
