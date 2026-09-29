@@ -66,56 +66,12 @@
     "verified": "Source page, real thumbnail visually inspected, CDN curl GET 200 image/jpeg at w=640"
   },
   {
-    "id": 17174766,
-    "role": "exterior",
-    "description": "White and timber contemporary villa",
-    "author": "Viktoriia Kondratiuk",
-    "url": "https://images.pexels.com/photos/17174766/pexels-photo-17174766.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "source": "https://www.pexels.com/photo/stylish-modern-villa-17174766/",
-    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
-    "license": "https://www.pexels.com/license/",
-    "verified": "Source page, real thumbnail visually inspected, CDN curl GET 200 image/jpeg at w=640"
-  },
-  {
-    "id": 14998335,
-    "role": "exterior",
-    "description": "White and brick villa architectural close-up",
-    "author": "Nino Sanger",
-    "url": "https://images.pexels.com/photos/14998335/pexels-photo-14998335.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "source": "https://www.pexels.com/photo/family-modern-villa-14998335/",
-    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
-    "license": "https://www.pexels.com/license/",
-    "verified": "Source page, real thumbnail visually inspected, CDN curl GET 200 image/jpeg at w=640"
-  },
-  {
-    "id": 24807128,
-    "role": "exterior",
-    "description": "Mediterranean contemporary villa with pool",
-    "author": "Ahmet ÇÖTÜR",
-    "url": "https://images.pexels.com/photos/24807128/pexels-photo-24807128.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "source": "https://www.pexels.com/photo/luxury-house-with-pool-24807128/",
-    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
-    "license": "https://www.pexels.com/license/",
-    "verified": "Source page, real thumbnail visually inspected, CDN curl GET 200 image/jpeg at w=640"
-  },
-  {
     "id": 20297248,
     "role": "exterior",
     "description": "Stone villa pool courtyard",
     "author": "Çisel Bozar",
     "url": "https://images.pexels.com/photos/20297248/pexels-photo-20297248.jpeg?auto=compress&cs=tinysrgb&w=1600",
     "source": "https://www.pexels.com/photo/pool-in-house-garden-20297248/",
-    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
-    "license": "https://www.pexels.com/license/",
-    "verified": "Source page, real thumbnail visually inspected, CDN curl GET 200 image/jpeg at w=640"
-  },
-  {
-    "id": 13600516,
-    "role": "exterior",
-    "description": "White flat-roofed glazed house courtyard",
-    "author": "Pew Nguyen",
-    "url": "https://images.pexels.com/photos/13600516/pexels-photo-13600516.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "source": "https://www.pexels.com/photo/terrace-in-house-13600516/",
     "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
     "license": "https://www.pexels.com/license/",
     "verified": "Source page, real thumbnail visually inspected, CDN curl GET 200 image/jpeg at w=640"
@@ -143,28 +99,6 @@
     "verified": "Source page, real thumbnail visually inspected, CDN curl GET 200 image/jpeg at w=640"
   },
   {
-    "id": 7546713,
-    "role": "interior",
-    "description": "Minimal living room with suspended fireplace",
-    "author": "Max Vakhtbovych",
-    "url": "https://images.pexels.com/photos/7546713/pexels-photo-7546713.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "source": "https://www.pexels.com/photo/modern-living-room-with-a-fireplace-7546713/",
-    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
-    "license": "https://www.pexels.com/license/",
-    "verified": "Source page, real thumbnail visually inspected, CDN curl GET 200 image/jpeg at w=640"
-  },
-  {
-    "id": 7166931,
-    "role": "interior",
-    "description": "Beige apartment interior with oak panelling",
-    "author": "Max Vakhtbovych",
-    "url": "https://images.pexels.com/photos/7166931/pexels-photo-7166931.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "source": "https://www.pexels.com/photo/a-modern-living-room-7166931/",
-    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
-    "license": "https://www.pexels.com/license/",
-    "verified": "Source page, real thumbnail visually inspected, CDN curl GET 200 image/jpeg at w=640"
-  },
-  {
     "id": 5563466,
     "role": "terrace",
     "description": "Poolside terrace with timber pergola",
@@ -176,14 +110,146 @@
     "verified": "Source page, real thumbnail visually inspected, CDN curl GET 200 image/jpeg at w=640"
   },
   {
-    "id": 35070095,
-    "role": "landscape",
-    "description": "Urban planted terrace",
-    "author": "Enroupacer",
-    "url": "https://images.pexels.com/photos/35070095/pexels-photo-35070095.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "source": "https://www.pexels.com/photo/terrace-garden-in-modern-urban-building-35070095/",
+    "id": 24805054,
+    "role": "exterior",
+    "description": "Two-storey villa with stone walls and lit pool at blue hour",
+    "author": "Ahmet ÇÖTÜR",
+    "url": "https://images.pexels.com/photos/24805054/pexels-photo-24805054.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/view-of-the-terrace-with-a-swimming-pool-at-the-resort-24805054/",
     "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
     "license": "https://www.pexels.com/license/",
-    "verified": "Source page, real thumbnail visually inspected, CDN curl GET 200 image/jpeg at w=640"
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 31737862,
+    "role": "exterior",
+    "description": "Travertine and teak entrance portico glowing at night",
+    "author": "Sharath G.",
+    "url": "https://images.pexels.com/photos/31737862/pexels-photo-31737862.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/modern-house-entrance-at-night-illuminated-31737862/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 31737860,
+    "role": "exterior",
+    "description": "Modern luxury house at dusk with wet paving reflections (portrait)",
+    "author": "Sharath G.",
+    "url": "https://images.pexels.com/photos/31737860/pexels-photo-31737860.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/modern-luxury-house-at-night-with-lights-31737860/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 7031595,
+    "role": "exterior",
+    "description": "Symmetrical wood and stone contemporary villa, daytime",
+    "author": "Max Vakhtbovych",
+    "url": "https://images.pexels.com/photos/7031595/pexels-photo-7031595.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/contemporary-villa-against-cloudy-blue-sky-7031595/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 11435856,
+    "role": "exterior",
+    "description": "White brick minimalist house at golden hour (portrait)",
+    "author": "Sinitta Leunen",
+    "url": "https://images.pexels.com/photos/11435856/pexels-photo-11435856.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/modern-house-facade-11435856/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 33685845,
+    "role": "interior",
+    "description": "Walnut ceiling, fluted wood wall and marble hall (portrait)",
+    "author": "Essentia Media",
+    "url": "https://images.pexels.com/photos/33685845/pexels-photo-33685845.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/modern-minimalist-luxury-interior-design-33685845/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 19050701,
+    "role": "interior",
+    "description": "Warm loft living room with steel-framed windows and oak floor",
+    "author": "Gül Işık",
+    "url": "https://images.pexels.com/photos/19050701/pexels-photo-19050701.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/large-windows-in-living-room-19050701/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 7031213,
+    "role": "kitchen",
+    "description": "Dark marble and terracotta minimalist kitchen",
+    "author": "Max Vakhtbovych",
+    "url": "https://images.pexels.com/photos/7031213/pexels-photo-7031213.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/modern-convenient-island-kitchen-interior-design-7031213/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 6444248,
+    "role": "detail",
+    "description": "Grey panelled stairwell with glass balustrade (portrait)",
+    "author": "Max Vakhtbovych",
+    "url": "https://images.pexels.com/photos/6444248/pexels-photo-6444248.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/modern-building-interior-with-staircase-with-glass-railing-near-wall-6444248/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 11664583,
+    "role": "detail",
+    "description": "Green marble fireplace wall with stacked firewood (portrait)",
+    "author": "Ksenia Chernaya",
+    "url": "https://images.pexels.com/photos/11664583/pexels-photo-11664583.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/chimney-wood-in-living-room-11664583/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 7587879,
+    "role": "terrace",
+    "description": "Black house with steel pergola and timber deck",
+    "author": "Max Vakhtbovych",
+    "url": "https://images.pexels.com/photos/7587879/pexels-photo-7587879.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/terrace-in-house-7587879/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 8112852,
+    "role": "terrace",
+    "description": "Timber deck and lanterns at dusk (portrait)",
+    "author": "Rachel Claire",
+    "url": "https://images.pexels.com/photos/8112852/pexels-photo-8112852.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/little-terrace-in-front-of-a-wooden-house-8112852/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
+  },
+  {
+    "id": 20278613,
+    "role": "landscape",
+    "description": "Black bollard light among ornamental grasses (portrait)",
+    "author": "Daka",
+    "url": "https://images.pexels.com/photos/20278613/pexels-photo-20278613.jpeg?auto=compress&cs=tinysrgb&w=2000",
+    "source": "https://www.pexels.com/photo/lamp-in-yard-20278613/",
+    "reuse": "Pexels License: free commercial use and modification, attribution optional; do not imply endorsement.",
+    "license": "https://www.pexels.com/license/",
+    "verified": "Source page fetched (title and photographer confirmed), full-size CDN JPEG downloaded at w=2000 and visually inspected"
   }
 ]

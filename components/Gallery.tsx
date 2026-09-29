@@ -3,6 +3,7 @@ import { DirectionIcon } from "@/components/DirectionIcon";
 import { useRef, useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { photo } from "@/lib/content";
+
 export default function Gallery({
   images,
 }: {
@@ -27,18 +28,23 @@ export default function Gallery({
         {images.map((im, i) => (
           <button
             key={i}
-            className={i === 0 ? "gallery-wide" : ""}
+            type="button"
+            className={"gallery-item g" + (i % 6)}
+            data-reveal
+            style={{ "--i": i % 3 } as React.CSSProperties}
             onClick={() => {
               setActive(i);
               dialog.current?.showModal();
             }}
+            aria-label={im.label + " — увеличить"}
           >
-            <img src={photo(im.id)} alt={im.label} loading="lazy" />
-            <span>
-              {im.label}{" "}
-              <span>
-                Увеличить <DirectionIcon />
-              </span>
+            <img src={photo(im.id)} alt={im.label} loading="lazy" decoding="async" />
+            <span className="gallery-caption">
+              <b>0{i + 1}</b>
+              {im.label}
+            </span>
+            <span className="gallery-zoom">
+              <DirectionIcon />
             </span>
           </button>
         ))}
@@ -55,15 +61,22 @@ export default function Gallery({
           aria-label="Закрыть галерею"
           onClick={() => dialog.current?.close()}
         >
-          <X />
+          <X size={20} strokeWidth={1.5} />
         </button>
-        <img src={photo(images[active].id)} alt={images[active].label} />
-        <div>
+        <img
+          key={active}
+          src={photo(images[active].id)}
+          alt={images[active].label}
+        />
+        <div className="lightbox-bar">
           <button aria-label="Предыдущее фото" onClick={() => next(-1)}>
             <DirectionIcon direction="left" />
           </button>
           <span>
-            {images[active].label} · {active + 1} / {images.length}
+            {images[active].label}
+            <i>
+              {active + 1} / {images.length}
+            </i>
           </span>
           <button aria-label="Следующее фото" onClick={() => next(1)}>
             <DirectionIcon direction="right" />

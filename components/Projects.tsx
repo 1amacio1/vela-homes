@@ -3,44 +3,53 @@ import { DirectionIcon } from "@/components/DirectionIcon";
 import { useState } from "react";
 import { projects, photo, Project } from "@/lib/content";
 import { track } from "@/lib/tracking";
+
 export function ProjectCard({
   project,
   index = 0,
+  variant = "wide",
 }: {
   project: Project;
   index?: number;
+  variant?: "wide" | "tall";
 }) {
   return (
     <a
-      className="project-card"
+      className={"project-card " + variant}
       href={"/projects/" + project.slug}
       onClick={() => track("project_view", project.name)}
+      data-reveal
+      style={{ "--i": index % 4 } as React.CSSProperties}
     >
       <div className="project-photo">
         <img
           src={photo(project.image)}
           alt={"Дом «" + project.name + "» — архитектурная концепция"}
           loading="lazy"
+          decoding="async"
         />
-        <span className="project-label">{project.tag}</span>
+        <span className="project-tag">{project.tag}</span>
+        <span className="project-area">
+          {project.area}
+          <small>м²</small>
+        </span>
         <span className="circle-arrow">
           <DirectionIcon />
         </span>
       </div>
-      <div className="project-title">
+      <div className="project-caption">
         <h3>{project.name}</h3>
-        <span>{project.area} м²</span>
-      </div>
-      <div className="project-meta">
-        <span>{project.location}</span>
-        <span>
-          {project.floors} {project.floors === 1 ? "этаж" : "этажа"} ·{" "}
-          {project.material}
-        </span>
+        <p>
+          {project.location} · {project.floors}{" "}
+          {project.floors === 1 ? "этаж" : "этажа"} · {project.material}
+        </p>
       </div>
     </a>
   );
 }
+
+const filters = ["Все проекты", "Современный", "Одноэтажный", "Семейный"];
+
 export function Catalog() {
   const [filter, setFilter] = useState("Все проекты");
   const filtered = projects.filter(
@@ -48,22 +57,33 @@ export function Catalog() {
   );
   return (
     <>
-      <div className="catalog-filters" aria-label="Фильтр проектов">
-        {["Все проекты", "Современный", "Одноэтажный", "Семейный"].map((f) => (
-          <button
-            key={f}
-            className={filter === f ? "active" : ""}
-            onClick={() => setFilter(f)}
-          >
-            {f}
-            {f === "Все проекты" && <sup>12</sup>}
-          </button>
-        ))}
-        <span>{filtered.length} проектов</span>
+      <div className="catalog-filters" role="group" aria-label="Фильтр проектов">
+        {filters.map((f) => {
+          const count =
+            f === "Все проекты"
+              ? projects.length
+              : projects.filter((p) => p.tag === f).length;
+          return (
+            <button
+              key={f}
+              className={filter === f ? "active" : ""}
+              aria-pressed={filter === f}
+              onClick={() => setFilter(f)}
+            >
+              {f}
+              <sup aria-hidden="true">{count}</sup>
+            </button>
+          );
+        })}
       </div>
-      <div className="project-grid">
+      <div className="catalog-grid" key={filter}>
         {filtered.map((p, i) => (
-          <ProjectCard key={p.slug} project={p} index={i} />
+          <ProjectCard
+            key={p.slug}
+            project={p}
+            index={i}
+            variant={i % 4 === 1 || i % 4 === 2 ? "tall" : "wide"}
+          />
         ))}
       </div>
     </>

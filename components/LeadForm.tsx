@@ -148,13 +148,13 @@ export default function LeadForm({
     return (
       <div className="form-success" role="status">
         <div className="success-icon">
-          <Check size={34} />
+          <Check size={28} strokeWidth={1.5} />
         </div>
-        <p className="eyebrow">ПЕРВЫЙ ШАГ СДЕЛАН</p>
+        <p className="label">Первый шаг сделан</p>
         <h3>
           Ваша история
           <br />
-          начинается здесь.
+          <em>начинается здесь.</em>
         </h3>
         <p>Заявка сохранена. Мы изучим ваши пожелания и свяжемся с вами.</p>
         <small>Номер заявки: {success.slice(0, 8).toUpperCase()}</small>
@@ -181,6 +181,13 @@ export default function LeadForm({
         }
       }}
     >
+      <div className="form-intro">
+        <p className="label">Заявка</p>
+        <p>
+          Ответим в течение рабочего дня. Можно приложить свой проект,
+          планировку или референсы.
+        </p>
+      </div>
       {calculation && (
         <div className="attached-calculation">
           <div>
@@ -205,7 +212,7 @@ export default function LeadForm({
         </div>
       )}
       <div className="field-row">
-        <label>
+        <label className="field">
           Ваше имя *
           <input
             name="name"
@@ -216,7 +223,7 @@ export default function LeadForm({
             maxLength={100}
           />
         </label>
-        <label>
+        <label className="field">
           Телефон *
           <input
             name="phone"
@@ -230,7 +237,7 @@ export default function LeadForm({
         </label>
       </div>
       <div className="field-row">
-        <label>
+        <label className="field">
           Email *
           <input
             name="email"
@@ -241,7 +248,7 @@ export default function LeadForm({
             maxLength={200}
           />
         </label>
-        <label>
+        <label className="field">
           Город / регион строительства *
           <input
             name="region"
@@ -257,7 +264,7 @@ export default function LeadForm({
         <legend>Что вы планируете? *</legend>
         <div className="service-chips">
           {services.map((s) => (
-            <label className={selected.includes(s) ? "selected" : ""} key={s}>
+            <label className={"chip " + (selected.includes(s) ? "selected" : "")} key={s}>
               <input
                 type="checkbox"
                 checked={selected.includes(s)}
@@ -274,7 +281,7 @@ export default function LeadForm({
           ))}
         </div>
       </fieldset>
-      <label>
+      <label className="field">
         Примерная площадь, м²
         <input
           key={calculation?.area || "free"}
@@ -287,7 +294,7 @@ export default function LeadForm({
           readOnly={!!calculation}
         />
       </label>
-      <label>
+      <label className="field">
         Расскажите о проекте
         <textarea
           name="comment"
@@ -317,7 +324,7 @@ export default function LeadForm({
           }}
         />
         <button type="button" onClick={() => input.current?.click()}>
-          <Paperclip size={19} />
+          <Paperclip size={18} strokeWidth={1.5} />
           <span>
             Прикрепить проект или референсы
             <small>До 5 файлов · PDF и изображения · до 10 МБ каждый</small>
@@ -336,9 +343,10 @@ export default function LeadForm({
           </div>
         ))}
       </div>
-      <label className="check consent">
+      <label className="toggle consent">
         <input type="checkbox" name="consent" required />
-        <span>
+        <span className="toggle-box" aria-hidden="true" />
+        <span className="toggle-label">
           Я согласен с{" "}
           <a href="/privacy" target="_blank" rel="noreferrer">
             политикой конфиденциальности
@@ -351,7 +359,7 @@ export default function LeadForm({
           {error}
         </p>
       )}
-      <button className="button submit" type="submit" disabled={busy}>
+      <button className="button large submit" type="submit" disabled={busy}>
         {busy ? (
           <>
             <LoaderCircle className="spin" size={18} />

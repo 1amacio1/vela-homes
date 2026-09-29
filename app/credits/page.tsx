@@ -6,12 +6,12 @@ export default function Page() {
   return (
     <>
       <Header solid />
-      <main className="section legal">
-        <p className="eyebrow">VELA / ДЕМОНСТРАЦИОННЫЙ ПРОЕКТ</p>
+      <main className="inner-page section legal">
+        <div className="section-index"><span>VELA</span><i /><span>ДЕМОНСТРАЦИОННЫЙ ПРОЕКТ</span></div>
         <h1>
           Архитектура
           <br />
-          <span className="title-accent">вдохновения.</span>
+          <em>вдохновения.</em>
         </h1>
         <p>
           Сайт демонстрирует работу строительной компании по заданному сценарию.

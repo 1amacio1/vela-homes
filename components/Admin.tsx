@@ -1,5 +1,7 @@
 "use client";
 import { DirectionIcon } from "@/components/DirectionIcon";
+import { Logo } from "@/components/Logo";
+import "@/app/admin.css";
 import { useEffect, useState, useCallback } from "react";
 import {
   Download,
@@ -201,16 +203,13 @@ export default function Admin({ authenticated }: { authenticated: boolean }) {
   if (!auth)
     return (
       <main className="admin-login">
-        <a className="logo" href="/">
-          V<span>ELA</span>
-          <i>АРХИТЕКТУРА ЖИЗНИ</i>
-        </a>
+        <Logo />
         <form onSubmit={login}>
           <p className="eyebrow">ВХОД ДЛЯ КОМАНДЫ</p>
           <h1>
             Всё под
             <br />
-            <span className="title-accent">контролем.</span>
+            <em>контролем.</em>
           </h1>
           <label>
             Логин
@@ -252,10 +251,7 @@ export default function Admin({ authenticated }: { authenticated: boolean }) {
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
-        <a className="logo" href="/">
-          V<span>ELA</span>
-          <i>УПРАВЛЕНИЕ САЙТОМ</i>
-        </a>
+        <Logo />
         <nav>
           {[
             {
