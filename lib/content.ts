@@ -183,6 +183,7 @@ export const pictures = {
   hero: 13752348,
   aboutMain: 4626268,
   aboutSmall: 10610731,
+  strip: [7598378, 31737860, 33685845, 20278613],
   band: [
     { id: 7031213, label: "Кухня и материалы" },
     { id: 8112852, label: "Терраса вечером" },

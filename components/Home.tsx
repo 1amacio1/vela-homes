@@ -52,71 +52,91 @@ export default function Home() {
 
 function Hero() {
   const featured = projects[0];
+  const directions = [
+    { title: "Проекты домов", text: "12 реализованных историй", href: "/projects", image: pictures.strip[0], event: "Проекты" },
+    { title: "Строительство", text: "Тёплый контур, предчистовая, под ключ", href: "#services", image: pictures.strip[1], event: "Строительство" },
+    { title: "Интерьер и отделка", text: "Свой дизайнер или наш", href: "#services", image: pictures.strip[2], event: "Интерьер" },
+    { title: "Участок и ландшафт", text: "Террасы, газон, освещение", href: "#services", image: pictures.strip[3], event: "Ландшафт" },
+  ];
   return (
     <section className="hero" aria-label="VELA — строительство домов">
-      <div className="hero-media">
-        <img
-          src={photo(pictures.hero)}
-          alt="Современный дом с панорамным остеклением в сумерках"
-          fetchPriority="high"
-          decoding="async"
-        />
-      </div>
-      <div className="hero-shade" />
-      <div className="hero-inner">
-        <div className="hero-copy">
-          <h1 style={{ "--i": 1 } as React.CSSProperties}>
-            Место, где
-            <br />
-            начинается <em>ваша жизнь</em>
-          </h1>
-          <p className="hero-sub" style={{ "--i": 2 } as React.CSSProperties}>
-            VELA. Строительство домов по всей России —{" "}
-            <br />
-            от первого эскиза до ключей в ваших руках.
-          </p>
-          <div className="hero-actions" style={{ "--i": 3 } as React.CSSProperties}>
-            <a
-              className="button"
-              href="#calculator"
-              onClick={() => track("cta_click", "Рассчитать стоимость")}
-            >
-              Рассчитать стоимость
-            </a>
-            <a
-              className="text-link"
-              href="#projects"
-              onClick={() => track("cta_click", "Смотреть проекты")}
-            >
-              Смотреть проекты <DirectionIcon />
-            </a>
-          </div>
+      <div className="hero-stage">
+        <div className="hero-media">
+          <img
+            src={photo(pictures.hero)}
+            alt="Современный дом с панорамным остеклением в сумерках"
+            fetchPriority="high"
+            decoding="async"
+          />
         </div>
-        <a
-          className="hero-featured"
-          href={"/projects/" + featured.slug}
-          onClick={() => track("project_view", featured.name)}
-          style={{ "--i": 4 } as React.CSSProperties}
-        >
-          <span className="hero-featured-label">На фото</span>
-          <span className="hero-featured-name">
-            {featured.name}
+        <div className="hero-shade" />
+        <div className="hero-inner">
+          <div className="hero-copy">
+            <p className="hero-kicker" style={{ "--i": 0 } as React.CSSProperties}>
+              <span>VELA</span>
+              <i />
+              <span>Частные дома · с 2005 года</span>
+            </p>
+            <h1 style={{ "--i": 1 } as React.CSSProperties}>
+              Строительство домов
+              <br />
+              по всей России
+            </h1>
+            <p className="hero-sub" style={{ "--i": 2 } as React.CSSProperties}>
+              Проектируем, строим и отделываем частные дома под ключ.
+              Можно прийти с идеей, готовым проектом или своим архитектором —
+              возьмём на себя весь процесс или отдельный этап.
+            </p>
+            <div className="hero-actions" style={{ "--i": 3 } as React.CSSProperties}>
+              <a
+                className="button"
+                href="#calculator"
+                onClick={() => track("cta_click", "Рассчитать стоимость")}
+              >
+                Рассчитать стоимость
+              </a>
+              <a
+                className="button ghost"
+                href="#projects"
+                onClick={() => track("cta_click", "Смотреть проекты")}
+              >
+                Смотреть проекты <DirectionIcon />
+              </a>
+            </div>
+          </div>
+          <a
+            className="hero-featured"
+            href={"/projects/" + featured.slug}
+            onClick={() => track("project_view", featured.name)}
+          >
+            <span className="hero-featured-label">На фото</span>
+            <span className="hero-featured-name">
+              {featured.name}
+              <DirectionIcon size={16} />
+            </span>
+            <span className="hero-featured-meta">
+              {featured.area} м² · {featured.location}
+            </span>
+          </a>
+        </div>
+      </div>
+      <nav className="hero-strip" aria-label="Направления работы">
+        {directions.map((d, i) => (
+          <a
+            key={d.title}
+            href={d.href}
+            style={{ "--i": i } as React.CSSProperties}
+            onClick={() => track("cta_click", d.event)}
+          >
+            <img src={photo(d.image)} alt="" loading="lazy" decoding="async" />
+            <span>
+              <strong>{d.title}</strong>
+              <small>{d.text}</small>
+            </span>
             <DirectionIcon size={16} />
-          </span>
-          <span className="hero-featured-meta">
-            {featured.area} м² · {featured.location}
-          </span>
-        </a>
-      </div>
-      <div className="hero-foot">
-        <span>Архитектура</span>
-        <span>Строительство</span>
-        <span>Интерьер</span>
-        <span>Ландшафт</span>
-        <a href="#projects" className="hero-scroll" aria-label="Листайте вниз">
-          <i />
-        </a>
-      </div>
+          </a>
+        ))}
+      </nav>
     </section>
   );
 }
