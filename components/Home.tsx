@@ -63,9 +63,6 @@ function Hero() {
       <div className="hero-shade" />
       <div className="hero-inner">
         <div className="hero-copy">
-          <p className="eyebrow light" style={{ "--i": 0 } as React.CSSProperties}>
-            Строительство домов по всей России · с 2005 года
-          </p>
           <h1 style={{ "--i": 1 } as React.CSSProperties}>
             Место, где
             <br />
