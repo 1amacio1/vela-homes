@@ -22,7 +22,7 @@ for (const [sname, width, height] of sizes) {
     reducedMotion: "reduce",
   });
   const page = await ctx.newPage();
-  await page.addInitScript(() => localStorage.setItem("vela_analytics", "no"));
+  await page.addInitScript(() => { localStorage.setItem("vela_analytics", "no"); sessionStorage.setItem("vela_intro", "1"); });
   for (const [pname, path] of pages) {
     await page.goto(base + path, { waitUntil: "networkidle" });
     await page.waitForTimeout(600);

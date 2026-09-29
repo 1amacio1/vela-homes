@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Golos_Text } from "next/font/google";
+import { Playfair_Display, Golos_Text } from "next/font/google";
 import { Reveal } from "@/components/Motion";
 import "./globals.css";
 
-const display = Cormorant_Garamond({
+const display = Playfair_Display({
   subsets: ["cyrillic", "latin"],
-  weight: ["300", "400", "500"],
+  weight: ["400", "500", "600"],
   style: ["normal"],
   variable: "--font-display",
   display: "swap",
