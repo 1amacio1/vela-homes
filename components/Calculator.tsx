@@ -98,26 +98,9 @@ export default function Calculator({
       <div className="calculator">
         <div className="calc-options" data-reveal>
           <div className="calc-group calc-area">
-            <div className="area-heading">
-              <label htmlFor="area">Площадь дома</label>
-              <div className="area-value">
-                <input
-                  id="area"
-                  type="number"
-                  inputMode="numeric"
-                  min="40"
-                  max="1000"
-                  value={value.area}
-                  onChange={(e) =>
-                    update(
-                      "area",
-                      Math.min(1000, Math.max(40, Number(e.target.value))),
-                    )
-                  }
-                />
-                <span>м²</span>
-              </div>
-            </div>
+            <label htmlFor="area" className="calc-label">
+              Площадь дома
+            </label>
             <input
               aria-label="Площадь дома — ползунок"
               className="range"
@@ -131,50 +114,49 @@ export default function Calculator({
             />
             <div className="range-labels">
               <span>40 м²</span>
+              <span>Точную площадь можно ввести в карточке расчёта</span>
               <span>500 м²</span>
             </div>
           </div>
 
-          <div className="calc-row">
-            <fieldset className="calc-group">
-              <legend>Количество этажей</legend>
-              <div className="segmented">
-                {[1, 2, 3].map((n) => (
-                  <label
-                    key={n}
-                    className={value.floors === n ? "selected" : ""}
-                  >
-                    <input
-                      type="radio"
-                      name="floors"
-                      checked={value.floors === n}
-                      onChange={() => update("floors", n)}
-                    />
-                    {n} {n === 1 ? "этаж" : "этажа"}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-            <fieldset className="calc-group">
-              <legend>Материал дома</legend>
-              <div className="chips">
-                {materials.map((m) => (
-                  <label
-                    key={m}
-                    className={value.material === m ? "selected" : ""}
-                  >
-                    <input
-                      type="radio"
-                      name="material"
-                      checked={value.material === m}
-                      onChange={() => update("material", m)}
-                    />
-                    {m}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          </div>
+          <fieldset className="calc-group">
+            <legend>Количество этажей</legend>
+            <div className="segmented">
+              {[1, 2, 3].map((n) => (
+                <label
+                  key={n}
+                  className={value.floors === n ? "selected" : ""}
+                >
+                  <input
+                    type="radio"
+                    name="floors"
+                    checked={value.floors === n}
+                    onChange={() => update("floors", n)}
+                  />
+                  {n} {n === 1 ? "этаж" : "этажа"}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="calc-group">
+            <legend>Материал дома</legend>
+            <div className="chips">
+              {materials.map((m) => (
+                <label
+                  key={m}
+                  className={value.material === m ? "selected" : ""}
+                >
+                  <input
+                    type="radio"
+                    name="material"
+                    checked={value.material === m}
+                    onChange={() => update("material", m)}
+                  />
+                  {m}
+                </label>
+              ))}
+            </div>
+          </fieldset>
 
           <fieldset className="calc-group">
             <legend>Комплектация</legend>
@@ -267,7 +249,22 @@ export default function Calculator({
         <aside className="calc-result" data-reveal>
           <p className="label">Ваш будущий дом</p>
           <div className="calc-figure">
-            <strong>{value.area}</strong>
+            <input
+              id="area"
+              type="number"
+              inputMode="numeric"
+              min="40"
+              max="1000"
+              value={value.area}
+              style={{ "--len": String(value.area).length } as React.CSSProperties}
+              onFocus={(e) => e.currentTarget.select()}
+              onChange={(e) =>
+                update(
+                  "area",
+                  Math.min(1000, Math.max(40, Number(e.target.value))),
+                )
+              }
+            />
             <span>м²</span>
           </div>
           <p className="calc-summary">

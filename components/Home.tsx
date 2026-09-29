@@ -332,7 +332,6 @@ function Reviews() {
     return () => clearInterval(t);
   }, [paused]);
   const r = reviews[index];
-  const project = projects.find((p) => p.slug === r.slug)!;
   return (
     <section
       className="section reviews"
@@ -347,17 +346,37 @@ function Reviews() {
         </div>
       </header>
       <div className="review-grid">
-        <blockquote className="review" key={index} aria-live="polite" data-reveal>
-          <p>{r.text}</p>
-          <footer>
-            <strong>{r.name}</strong>
-            <a href={"/projects/" + r.slug}>
-              Дом «{r.project}» <DirectionIcon size={14} />
-            </a>
-          </footer>
-        </blockquote>
+        <div className="review-stack" aria-live="polite" data-reveal>
+          {reviews.map((x, i) => (
+            <blockquote
+              key={x.name}
+              className={"review" + (i === index ? " is-active" : "")}
+              aria-hidden={i !== index}
+            >
+              <p>{x.text}</p>
+              <footer>
+                <strong>{x.name}</strong>
+                <a href={"/projects/" + x.slug} tabIndex={i === index ? 0 : -1}>
+                  Дом «{x.project}» <DirectionIcon size={14} />
+                </a>
+              </footer>
+            </blockquote>
+          ))}
+        </div>
         <a className="review-photo" href={"/projects/" + r.slug} aria-label={"Проект «" + r.project + "»"} data-reveal>
-          <img key={r.slug} src={photo(project.image)} alt="" loading="lazy" decoding="async" />
+          {reviews.map((x, i) => {
+            const pr = projects.find((p) => p.slug === x.slug)!;
+            return (
+              <img
+                key={x.slug}
+                src={photo(pr.image)}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className={i === index ? "is-active" : ""}
+              />
+            );
+          })}
         </a>
         <div className="review-nav" data-reveal>
           <button aria-label="Предыдущий отзыв" onClick={() => setIndex((index + reviews.length - 1) % reviews.length)}>
