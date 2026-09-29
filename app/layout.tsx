@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geologica, Onest, Playfair_Display, Golos_Text } from "next/font/google";
+import { Geologica, Onest } from "next/font/google";
 import { Motion } from "@/components/Motion";
 import "./globals.css";
 import "./intro.css";
@@ -16,20 +16,6 @@ const text = Onest({
   variable: "--font-text",
   display: "swap",
 });
-/* Шрифты заставки: заставка сохранена без изменений. */
-const intro = Playfair_Display({
-  subsets: ["cyrillic", "latin"],
-  weight: ["600"],
-  variable: "--font-intro",
-  display: "swap",
-});
-const introText = Golos_Text({
-  subsets: ["cyrillic", "latin"],
-  weight: ["600"],
-  variable: "--font-intro-text",
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: "VELA — строительство домов по всей России",
   description:
@@ -49,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="ru"
-      className={`${display.variable} ${text.variable} ${intro.variable} ${introText.variable}`}
+      className={`${display.variable} ${text.variable}`}
       suppressHydrationWarning
     >
       <body>

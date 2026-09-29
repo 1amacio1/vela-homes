@@ -88,7 +88,7 @@ export function Intro() {
             </span>
           ))}
         </div>
-        <p className="intro-tag">Архитектура жизни · с 2005</p>
+        <p className="intro-tag">Строительство домов · с 2005</p>
       </div>
       <div className="intro-line" />
     </div>

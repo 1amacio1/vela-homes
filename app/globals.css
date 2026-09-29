@@ -954,12 +954,17 @@ a:hover > .text-link .direction-icon {
 /* ---------- 03 · Услуги ---------- */
 .services {
   position: relative;
-  overflow: hidden;
+  overflow: clip;
   background: var(--bg-2);
 }
+/* Фон фиксированной высоты экрана: не зависит от высоты секции,
+   поэтому раскрытие пунктов не меняет масштаб фотографии. */
 .services-bg {
-  position: absolute;
-  inset: 0;
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  margin-bottom: -100svh;
+  pointer-events: none;
 }
 .services-bg img {
   position: absolute;
@@ -981,6 +986,7 @@ a:hover > .text-link .direction-icon {
 }
 .services-inner {
   position: relative;
+  z-index: 1;
 }
 .service-list {
   border-top: 1px solid var(--line-strong);

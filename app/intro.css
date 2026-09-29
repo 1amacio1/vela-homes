@@ -1,15 +1,14 @@
-/* Заставка при входе. Стили зафиксированы: не зависят от дизайн-системы сайта. */
+/* Заставка при входе. Палитра и шрифты синхронизированы с дизайн-системой v3. */
 .intro {
-  --bg: #0e0f0e;
-  --text: #eee9df;
-  --muted: #9c978d;
-  --accent: #b8976a;
-  --line: rgba(236, 231, 221, 0.12);
-  --font-display: var(--font-intro), Georgia, serif;
-  font-family: var(--font-intro-text), system-ui, sans-serif;
+  --bg: #0f1012;
+  --text: #efe9df;
+  --muted: #8f8a81;
+  --accent: #c9bba3;
+  --line: rgba(239, 233, 223, 0.1);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
-  --pad-wide: max(clamp(20px, 5.2vw, 104px), calc((100vw - 1640px) / 2));
+  --pad-wide: max(clamp(20px, 5vw, 96px), calc((100vw - 1720px) / 2));
+  font-family: var(--font-text), system-ui, sans-serif;
 }
 html.intro {
   overflow: hidden;
@@ -71,12 +70,12 @@ html.intro-skip .intro {
 }
 .intro-word {
   display: flex;
-  font-family: var(--font-display);
+  font-family: var(--font-display), system-ui, sans-serif;
   font-size: clamp(56px, 10.5vw, 132px);
   line-height: 1;
-  font-weight: 600;
-  letter-spacing: 0.26em;
-  padding-left: 0.26em;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  padding-left: 0.3em;
   position: relative;
   clip-path: inset(-20% 0);
 }
@@ -103,7 +102,7 @@ html.intro-skip .intro {
   background: linear-gradient(
     100deg,
     transparent 30%,
-    rgba(211, 185, 143, 0.55) 50%,
+    rgba(201, 187, 163, 0.5) 50%,
     transparent 70%
   );
   transform: translateX(-100%);
@@ -118,8 +117,8 @@ html.intro-skip .intro {
 }
 .intro-tag {
   font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.26em;
+  font-weight: 500;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--muted);
   opacity: 0;
