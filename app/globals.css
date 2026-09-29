@@ -714,11 +714,10 @@ a:hover > .text-link .direction-icon {
   position: absolute;
   inset: 0;
 }
-.feature-media img,
-.row-media img,
-.next-media img,
-.band img,
-.cover-media img {
+/* Масштаб для параллакса задаётся в CSS, а не скриптом: снимок
+   для перехода между страницами сразу совпадает с итоговым кадром. */
+[data-parallax] > img {
+  scale: 1.14;
   will-change: transform;
 }
 .feature::after {
@@ -2644,15 +2643,18 @@ a:hover > .text-link .direction-icon {
     opacity 0.5s var(--ease),
     transform 0.5s var(--ease);
 }
-html[data-brand="off"] .header.hero-brand .logo {
-  opacity: 0;
-  transform: translateY(-8px);
-  pointer-events: none;
+.header.hero-brand .logo-word {
+  transition:
+    opacity 0.5s var(--ease),
+    transform 0.5s var(--ease);
 }
-html.menu-open .header .logo {
+html[data-brand="off"] .header.hero-brand .logo-word {
+  opacity: 0;
+  transform: translateX(-8px);
+}
+html.menu-open .header .logo-word {
   opacity: 1 !important;
   transform: none !important;
-  pointer-events: auto !important;
 }
 
 /* ---------- Переходы между страницами ---------- */
@@ -2668,8 +2670,11 @@ html.menu-open .header .logo {
   view-transition-name: project-cover;
 }
 ::view-transition-group(project-cover) {
-  animation-duration: 0.7s;
-  animation-timing-function: var(--ease);
+  animation-duration: 0.8s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+::view-transition-image-pair(project-cover) {
+  isolation: auto;
 }
 ::view-transition-old(project-cover),
 ::view-transition-new(project-cover) {
@@ -3118,10 +3123,9 @@ html.menu-open .header .logo {
   @view-transition {
     navigation: none;
   }
-  html[data-brand="off"] .header.hero-brand .logo {
+  html[data-brand="off"] .header.hero-brand .logo-word {
     opacity: 1;
     transform: none;
-    pointer-events: auto;
   }
   html {
     scroll-behavior: auto;
@@ -3142,5 +3146,6 @@ html.menu-open .header .logo {
   }
   [data-parallax] img {
     transform: none !important;
+    scale: 1;
   }
 }

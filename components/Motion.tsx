@@ -88,7 +88,7 @@ export function Motion() {
         const r = el.getBoundingClientRect();
         if (r.bottom < -vh || r.top > vh * 2) continue;
         const progress = (r.top + r.height / 2 - vh / 2) / vh; // -1..1
-        img.style.transform = `translate3d(0, ${(-progress * speed * 100).toFixed(2)}px, 0) scale(${1 + speed * 1.6})`;
+        img.style.transform = `translate3d(0, ${(-progress * speed * 100).toFixed(2)}px, 0)`;
       }
     };
     const onScroll = () => {
@@ -148,6 +148,25 @@ export function Motion() {
     };
     document.addEventListener("pointerdown", onDown, true);
     document.addEventListener("focusin", onDown, true);
+    /* Предзагрузка страницы проекта при наведении: переход начинается
+       сразу после клика, без паузы на загрузку. */
+    const prefetched = new Set<string>();
+    const onEnter = (e: Event) => {
+      const link = (e.target as HTMLElement).closest<HTMLAnchorElement>(
+        'a[href^="/projects/"]',
+      );
+      if (!link) return;
+      const href = link.getAttribute("href")!;
+      if (prefetched.has(href)) return;
+      prefetched.add(href);
+      const l = document.createElement("link");
+      l.rel = "prefetch";
+      l.href = href;
+      l.as = "document";
+      document.head.appendChild(l);
+    };
+    document.addEventListener("pointerenter", onEnter, true);
+    document.addEventListener("touchstart", onEnter, { capture: true, passive: true });
     type RevealEvent = Event & { viewTransition?: { finished: Promise<void> } };
     const onReveal = (e: RevealEvent) => {
       const nav = (window as unknown as { navigation?: { activation?: { from?: { url: string } } } }).navigation;
@@ -168,6 +187,8 @@ export function Motion() {
     return () => {
       document.removeEventListener("pointerdown", onDown, true);
       document.removeEventListener("focusin", onDown, true);
+      document.removeEventListener("pointerenter", onEnter, true);
+      document.removeEventListener("touchstart", onEnter, true);
       window.removeEventListener("pagereveal", onReveal as EventListener);
       clear();
     };
