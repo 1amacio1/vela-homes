@@ -970,11 +970,18 @@ a:hover > .text-link .direction-icon {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 0.9s var(--ease);
+  transform: scale(1);
+  transform-origin: center;
+  transition:
+    opacity 0.9s var(--ease),
+    transform 2.2s var(--ease);
   filter: brightness(0.5) saturate(0.85);
 }
 .services-bg img.is-shown {
   opacity: 1;
+}
+.services-bg img.is-zoom {
+  transform: scale(1.06);
 }
 .services-bg::after {
   content: "";

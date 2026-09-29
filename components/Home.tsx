@@ -158,7 +158,8 @@ function Portfolio() {
 function Services({ onChoose }: { onChoose: (i: number | null) => void }) {
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState<number | null>(null);
-  const shown = open ?? active;
+  const [hover, setHover] = useState<number | null>(null);
+  const shown = hover ?? open ?? active;
   return (
     <section className="services" id="services">
       <div className="services-bg" aria-hidden="true">
@@ -169,7 +170,7 @@ function Services({ onChoose }: { onChoose: (i: number | null) => void }) {
             alt=""
             loading="lazy"
             decoding="async"
-            className={shown === i ? "is-shown" : ""}
+            className={(shown === i ? "is-shown" : "") + (hover === i ? " is-zoom" : "")}
           />
         ))}
       </div>
@@ -191,7 +192,11 @@ function Services({ onChoose }: { onChoose: (i: number | null) => void }) {
               className={open === i ? "is-open" : ""}
               data-reveal
               style={{ "--i": i } as React.CSSProperties}
-              onMouseEnter={() => setActive(i)}
+              onMouseEnter={() => {
+                setActive(i);
+                setHover(i);
+              }}
+              onMouseLeave={() => setHover(null)}
             >
               <button
                 type="button"
