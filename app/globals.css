@@ -2952,6 +2952,14 @@ h3 em,
     grid-column: 1 / -1;
     justify-self: start;
   }
+  .project-caption {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .project-caption p {
+    text-align: left;
+  }
   .page-head-row {
     grid-template-columns: 1fr;
   }
