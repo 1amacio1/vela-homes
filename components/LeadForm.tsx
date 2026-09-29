@@ -3,6 +3,7 @@ import { DirectionIcon } from "@/components/DirectionIcon";
 import { createId } from "@/lib/id";
 import { useRef, useState } from "react";
 import { Paperclip, Check, LoaderCircle, X } from "lucide-react";
+import { PhoneInput } from "./PhoneInput";
 import {
   services,
   type Calculation,
@@ -225,14 +226,13 @@ export default function LeadForm({
         </label>
         <label className="field">
           Телефон *
-          <input
+          <PhoneInput
             name="phone"
-            type="tel"
-            autoComplete="tel"
-            placeholder="+7 (___) ___-__-__"
             required
-            minLength={10}
-            maxLength={30}
+            minLength={18}
+            maxLength={18}
+            pattern="\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}"
+            title="Введите номер в формате +7 (999) 123-45-67"
           />
         </label>
       </div>
