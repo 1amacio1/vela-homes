@@ -145,13 +145,10 @@ function Portfolio() {
         ))}
       </div>
       <div className="portfolio-foot" data-reveal>
+        <p className="lead">Ещё восемь домов — в каталоге: одноэтажные, семейные, современные.</p>
         <a className="button ghost large" href="/projects" onClick={() => track("cta_click", "Все проекты")}>
           Смотреть все проекты <DirectionIcon />
         </a>
-        <p className="demo-note">
-          Демонстрационное портфолио: проекты и характеристики вымышлены, фотографии показывают
-          архитектурные референсы.
-        </p>
       </div>
     </section>
   );
@@ -285,9 +282,27 @@ function About() {
           <dd>технологий строительства</dd>
         </div>
       </dl>
-      <div className="band" data-parallax="0.1" data-reveal>
-        <img src={photo(pictures.band)} alt="Терраса дома вечером" loading="lazy" decoding="async" />
-        <span>Продумано до последней детали</span>
+      <div className="details">
+        <figure className="details-main" data-parallax="0.08" data-reveal>
+          <img src={photo(pictures.band)} alt="Терраса дома вечером" loading="lazy" decoding="async" />
+        </figure>
+        <div className="details-side">
+          <figure className="details-small" data-reveal style={{ "--i": 1 } as React.CSSProperties}>
+            <img src={photo(pictures.detail)} alt="Фактура камня и дерева в интерьере" loading="lazy" decoding="async" />
+          </figure>
+          <div className="details-copy" data-reveal style={{ "--i": 2 } as React.CSSProperties}>
+            <h3>Продумано до последней детали</h3>
+            <p>
+              Свет, материалы и пропорции подбираем вместе с вами: от фасада и кровли до фурнитуры,
+              освещения участка и высоты ступени на террасе.
+            </p>
+            <ul>
+              <li>Газобетон, кирпич, керамика, дерево, каркас</li>
+              <li>Инженерные системы в одном проекте с домом</li>
+              <li>Террасы, беседки, газон и освещение участка</li>
+            </ul>
+          </div>
+        </div>
       </div>
       <ol className="steps">
         {steps.map(([title, text], i) => (

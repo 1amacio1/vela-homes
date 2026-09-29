@@ -182,6 +182,7 @@ export const offerings = [
 export const pictures = {
   hero: 13752348,
   band: 8112852,
+  detail: 33685845,
 };
 /** Галерея проекта: фасад, интерьер, детали, терраса, участок, вход. */
 export function gallery(index: number) {

@@ -12,16 +12,16 @@ export function Motion() {
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const revealAll = () =>
-      document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-in)");
+      document.querySelectorAll<HTMLElement>("[data-reveal]:not([data-in])");
     if (reduce || !("IntersectionObserver" in window)) {
-      revealAll().forEach((el) => el.classList.add("is-in"));
+      revealAll().forEach((el) => (el.dataset.in = "1"));
       return;
     }
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries)
           if (e.isIntersecting) {
-            e.target.classList.add("is-in");
+            (e.target as HTMLElement).dataset.in = "1";
             io.unobserve(e.target);
           }
       },
@@ -52,7 +52,7 @@ export function Motion() {
       /* Страховка для reveal: всё, что уже в кадре, показываем. */
       for (const el of revealAll()) {
         const r = el.getBoundingClientRect();
-        if (r.top < vh * 0.92 && r.bottom > 0) el.classList.add("is-in");
+        if (r.top < vh * 0.92 && r.bottom > 0) el.dataset.in = "1";
       }
       for (const { el, img, speed } of items) {
         const r = el.getBoundingClientRect();
